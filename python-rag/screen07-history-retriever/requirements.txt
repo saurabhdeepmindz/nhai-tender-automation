@@ -6,9 +6,8 @@ fastapi==0.104.1
 uvicorn[standard]==0.24.0
 python-multipart==0.0.6
 
-# LangChain and AI/ML
-langchain==0.1.0
-langchain-community==0.0.10
+# LangChain and AI/ML: version pinned by ../shared/requirements.txt (langchain-openai
+# support requires langchain-community>=0.0.13, newer than this service's old 0.0.10 pin)
 
 # Vector Database
 chromadb==0.4.18
