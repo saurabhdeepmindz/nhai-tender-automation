@@ -48,8 +48,12 @@ from llm_utils import (
     LLMManager,
     PromptTemplateManager
 )
-# Import RAGAS evaluator
-from ragas_evaluator import RAGASEvaluator
+# Import RAGAS evaluator (optional: pulls in the heavy `ragas`/`datasets` packages,
+# and is already treated as best-effort at the call site below)
+try:
+    from ragas_evaluator import RAGASEvaluator
+except ImportError:
+    RAGASEvaluator = None
 
 # ChromaDB for vector storage
 import chromadb
