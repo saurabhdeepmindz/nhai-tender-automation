@@ -33,7 +33,8 @@ export class VectorizationLog {
 
   @Column({
     name: 'status',
-    type: 'varchar',
+    type: 'enum',
+    enum: ['success', 'failed'],
   })
   status!: 'success' | 'failed';
 
