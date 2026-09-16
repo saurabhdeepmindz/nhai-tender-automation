@@ -1,0 +1,16 @@
+query_db
+chroma_db
+logs
+*.log
+.env
+.env.*
+__pycache__
+*.bak
+*.backup
+chief_engineer_agent copy.py
+check_*.py
+debug_*.py
+diagnose_*.py
+verify_*.py
+test_*.py
+scripts

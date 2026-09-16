@@ -1,0 +1,11 @@
+node_modules
+.next
+logs
+*.log
+.env
+.env.*
+New folder
+e2e
+playwright-report
+test-results
+coverage

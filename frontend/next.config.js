@@ -2,6 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  output: 'standalone',
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
     NEXT_PUBLIC_RAG_HISTORY_URL: process.env.NEXT_PUBLIC_RAG_HISTORY_URL || 'http://localhost:8000/api',
@@ -12,7 +13,7 @@ const nextConfig = {
       beforeFiles: [
         {
           source: '/api/:path*',
-          destination: 'http://localhost:3001/api/:path*',
+          destination: `${process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001'}/api/:path*`,
         },
       ],
     };

@@ -1,0 +1,10 @@
+chroma_db
+logs
+*.log
+.env
+.env.*
+__pycache__
+main.old.py
+main.py.backup
+main.py.backup.step2
+main.py.backup.step2b

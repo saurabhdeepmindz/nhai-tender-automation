@@ -1,0 +1,11 @@
+chroma_db
+uploads
+logs
+*.log
+.env
+.env.*
+__pycache__
+main.py.bak
+new-requirements-txt
+cd
+scripts

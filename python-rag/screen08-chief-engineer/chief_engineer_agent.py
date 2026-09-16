@@ -22,7 +22,6 @@ import asyncio
 import httpx
 import numpy as np
 
-from langchain_community.llms import Ollama
 from langchain_core.prompts import PromptTemplate
 
 from workflow_manager_pg import WorkflowManager
@@ -46,25 +45,21 @@ class ChiefEngineerAgent:
     comprehensive, context-aware responses to vendor queries.
     """
     
-    def __init__(self, screen7_url: str, workflow_manager: WorkflowManager, embedding_generator=None):
+    def __init__(self, screen7_url: str, workflow_manager: WorkflowManager, embedding_generator: Optional[Any] = None, llm_manager: Optional[Any] = None):
         """
         Initialize Chief Engineer Agent
-        
+
         Args:
             screen7_url: URL of Screen 7 History Retriever API
             workflow_manager: Workflow manager instance
             embedding_generator: Optional embedding generator for similarity search
+            llm_manager: LLMManager instance (respects LLM_PROVIDER=openai|ollama)
         """
         self.screen7_url = screen7_url
         self.workflow_manager = workflow_manager
         self.embedding_generator = embedding_generator
-        
-        # Initialize LLM
-        self.llm = Ollama(
-            model=os.getenv("LLM_MODEL", "llama2"),
-            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        )
-        
+        self.llm_manager = llm_manager
+
         # Initialize HTTP client for Screen 7
         self.http_client = httpx.AsyncClient(timeout=30.0)
         
@@ -205,16 +200,13 @@ Return ONLY a JSON object with these fields.""",
                 input_variables=["rfp_context", "query_text"]
             )
             
-            # Generate analysis
-            # Use the correct method to generate a response from Ollama
+            # Generate analysis via the configured LLM provider (OpenAI or Ollama)
             response = await asyncio.to_thread(
-                self.llm.generate,
-                [
-                    analysis_prompt.format(
-                        rfp_context=str(rfp_context),
-                        query_text=query_text
-                    )
-                ]
+                self.llm_manager.generate,
+                analysis_prompt.format(
+                    rfp_context=str(rfp_context),
+                    query_text=query_text
+                )
             )
             
             # Extract generated text from LLMResult
@@ -890,11 +882,10 @@ NOW GENERATE RESPONSE (direct answer only, no formalities):""",
                 context=context_str if context_str else "No similar queries found."
             )
             
-            # Generate response using LLM
-            logger.info("Generating response using Ollama LLM...")
+            # Generate response using the configured LLM provider (OpenAI or Ollama)
+            logger.info("Generating response using configured LLM provider...")
             try:
-                # Use the invoke method for Ollama LLM
-                llm_response = await asyncio.to_thread(self.llm.invoke, formatted_prompt)
+                llm_response = await asyncio.to_thread(self.llm_manager.generate, formatted_prompt)
                 
                 # Extract response text
                 if isinstance(llm_response, str):

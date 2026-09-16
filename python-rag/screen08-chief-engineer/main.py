@@ -324,7 +324,8 @@ def initialize_services():
         chief_engineer = ChiefEngineerAgent(
             screen7_url=screen7_url,
             workflow_manager=workflow_manager,
-            embedding_generator=embedding_generator  # Pass embedding generator for similarity search
+            embedding_generator=embedding_generator,  # Pass embedding generator for similarity search
+            llm_manager=llm_manager  # Respects LLM_PROVIDER=openai|ollama
         )
         
         # Add query_collection to chief_engineer for /store-query endpoint

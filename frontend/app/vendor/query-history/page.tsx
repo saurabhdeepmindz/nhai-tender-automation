@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ClipboardList, Search, ArrowLeft, RefreshCw } from 'lucide-react';
 
@@ -25,6 +25,14 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function QueryHistoryPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50" />}>
+      <QueryHistoryContent />
+    </Suspense>
+  );
+}
+
+function QueryHistoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [queries, setQueries] = useState<Query[]>([]);
