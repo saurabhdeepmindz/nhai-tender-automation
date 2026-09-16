@@ -1,0 +1,23 @@
+**/.env
+**/.env.*
+**/__pycache__
+**/*.pyc
+**/logs
+**/chroma_db
+**/query_db
+**/uploads
+**/*.log
+**/*.bak
+**/*.backup
+**/*.backup.*
+screen08-chief-engineer/chief_engineer_agent copy.py
+screen08-chief-engineer/check_*.py
+screen08-chief-engineer/debug_*.py
+screen08-chief-engineer/diagnose_*.py
+screen08-chief-engineer/verify_*.py
+screen08-chief-engineer/test_*.py
+screen08-chief-engineer/scripts
+screen07-history-retriever/new-requirements-txt
+screen07-history-retriever/scripts
+screen07-history-retriever/cd
+historical-data-service/main.old.py
