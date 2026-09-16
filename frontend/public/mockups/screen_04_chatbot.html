@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - AI Chatbot Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            gap: 20px;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            color: #1e3c72;
+            font-size: 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rfp-selector {
+            margin-bottom: 25px;
+        }
+
+        .rfp-selector label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .rfp-selector select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .rfp-selector select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .quick-questions {
+            margin-bottom: 25px;
+        }
+
+        .quick-questions h4 {
+            color: #1e3c72;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .quick-question-btn {
+            width: 100%;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            line-height: 1.4;
+        }
+
+        .quick-question-btn:hover {
+            background: #e8f0ff;
+            border-color: #2a5298;
+            color: #1e3c72;
+        }
+
+        .chat-info {
+            background: #e8f0ff;
+            padding: 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .chat-info strong {
+            color: #1e3c72;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .chat-container {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header-left h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .chat-header-left p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .chat-action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+        }
+
+        .message-content {
+            max-width: 70%;
+        }
+
+        .message.user .message-content {
+            text-align: right;
+        }
+
+        .message-bubble {
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            display: inline-block;
+            text-align: left;
+        }
+
+        .message.bot .message-bubble {
+            background: white;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .message.user .message-bubble {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .message-sources {
+            margin-top: 12px;
+            padding: 12px;
+            background: #e8f0ff;
+            border-radius: 8px;
+            border-left: 3px solid #2a5298;
+        }
+
+        .source-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .source-item {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .source-item:before {
+            content: '📄';
+            position: absolute;
+            left: 0;
+            font-size: 10px;
+        }
+
+        .message-feedback {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .feedback-text {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .feedback-btn {
+            background: none;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .feedback-btn:hover {
+            background: #e8f0ff;
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 12px;
+            padding: 20px 0;
+        }
+
+        .typing-indicator .message-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+        }
+
+        .typing-dots {
+            background: white;
+            padding: 14px 18px;
+            border-radius: 12px;
+            display: flex;
+            gap: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #2a5298;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chat-input-container {
+            padding: 20px 25px;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .chat-input-wrapper {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-controls {
+            flex: 1;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 14px 50px 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: none;
+            max-height: 120px;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .speech-mic-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 12px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+            font-size: 14px;
+        }
+
+        .speech-mic-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .speech-mic-btn.recording {
+            background: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .send-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 60px 40px;
+            color: #999;
+        }
+
+        .welcome-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .welcome-message h3 {
+            color: #1e3c72;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .chat-messages {
+                padding: 15px;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div style="background:#fef3c7;color:#78350f;text-align:center;padding:10px 16px;font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-size:13px;font-weight:600;border-bottom:2px solid #f59e0b;">
+  ⚠️ Static HTML Design Mockup — no backend, no live data. Visual/UX reference only.
+</div>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_02_vendor_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">ABC Construction Ltd.</div>
+                <div class="user-role">Vendor/Bidder</div>
+            </div>
+            <div class="user-avatar">AC</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div style="background:#e3f2fd;border-left:4px solid #1976d2;padding:6px 12px;margin-bottom:15px;font-size:13px;color:#1976d2;font-weight:500;">
+            Section 1: RFP Context Selection & Quick Questions<br>
+            <span style="font-size:12px;color:#333;">
+                API: <b>GET <a href="http://localhost:3000/api/rfp" target="_blank">http://localhost:3000/api/rfp</a></b><br>
+                Swagger: <a href="http://localhost:3000/api/docs#/RFP/getApiRfp" target="_blank">/rfp</a> (List all RFPs)<br>
+                Quick Questions: <b>GET <a href="http://localhost:3000/api/rfp/:id/quick-questions" target="_blank">http://localhost:3000/api/rfp/:id/quick-questions</a></b><br>
+                Swagger: <a href="http://localhost:3000/api/docs#/RFP/getApiRfpQuickQuestions" target="_blank">/rfp/{id}/quick-questions</a>
+            </span>
+        </div>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>💬 Chat Settings</h3>
+            
+            <div class="rfp-selector">
+                <label>Select RFP Context</label>
+                <select id="rfpContext" onchange="changeRFPContext()">
+                    <option value="rfp1">NH-319 Arrah Bypass - EPC Mode</option>
+                    <option value="rfp2">NH-30 Extension Project</option>
+                    <option value="rfp3">NH-48 Four Lane Expansion</option>
+                </select>
+            </div>
+
+            <div class="quick-questions">
+                <h4>📌 Quick Questions</h4>
+                <button class="quick-question-btn" onclick="askQuickQuestion('What are the eligibility criteria?')">
+                    What are the eligibility criteria?
+                </button>
+                <button class="quick-question-btn" onclick="askQuickQuestion('Explain the payment terms')">
+                    Explain the payment terms
+                </button>
+                <button class="quick-question-btn" onclick="askQuickQuestion('What is the EMD amount?')">
+                    What is the EMD amount?
+                </button>
+                <button class="quick-question-btn" onclick="askQuickQuestion('Clarify liquidated damages clause')">
+                    Clarify liquidated damages clause
+                </button>
+            </div>
+
+            <div class="chat-info">
+                <strong>💡 Tips:</strong>
+                Ask specific questions about clauses, requirements, or specifications. The AI will provide answers with exact references from the RFP document.
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div style="background:#fff3e0;border-left:4px solid #ff9800;padding:6px 12px;margin-bottom:15px;font-size:13px;color:#e65100;font-weight:500;">
+            Section 2: Chat Messages & AI Response Processing<br>
+            <span style="font-size:12px;color:#333;">
+                Send Message: <b>POST <a href="http://localhost:3000/api/chat/messages" target="_blank">http://localhost:3000/api/chat/messages</a></b><br>
+                Swagger: <a href="http://localhost:3000/api/docs#/Chat/postApiChatMessages" target="_blank">/chat/messages</a><br>
+                AI Response: <b>POST <a href="http://localhost:3000/api/chat/:sessionId/ai-response" target="_blank">http://localhost:3000/api/chat/:sessionId/ai-response</a></b><br>
+                Swagger: <a href="http://localhost:3000/api/docs#/Chat/postApiChatAiResponse" target="_blank">/chat/{sessionId}/ai-response</a>
+            </span>
+        </div>
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <h2>🤖 AI Assistant</h2>
+                    <p>Real-time RFP Query Support</p>
+                </div>
+                <div style="background:#e0f7fa;border-left:4px solid #00838f;padding:6px 12px;margin-bottom:8px;font-size:11px;color:#00838f;font-weight:500;width:100%;margin-left:20px;">
+                    Chat History: <b>GET <a href="http://localhost:3000/api/chat/sessions/:sessionId/history" target="_blank">http://localhost:3000/api/chat/sessions/:sessionId/history</a></b> | Swagger: <a href="http://localhost:3000/api/docs#/Chat/getApiChatHistory" target="_blank">/chat/sessions/{sessionId}/history</a>
+                </div>
+                <div class="chat-actions">
+                    <button class="chat-action-btn" onclick="exportConversation()">📥 Export</button>
+                    <button class="chat-action-btn" onclick="clearConversation()">🗑️ Clear</button>
+                </div>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="welcome-message" id="welcomeMessage">
+                    <div class="welcome-icon">🤖</div>
+                    <h3>Welcome to AI Chatbot Assistant</h3>
+                    <p>Ask me anything about the selected RFP document. I can help you understand clauses, requirements, and specifications with exact references.</p>
+                </div>
+
+                <!-- Messages will be dynamically added here -->
+            </div>
+
+            <!-- Typing Indicator (hidden by default) -->
+            <div class="typing-indicator" id="typingIndicator" style="display: none;">
+                <div class="message-avatar">🤖</div>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <div class="input-controls">
+                        <textarea 
+                            class="chat-input" 
+                            id="chatInput" 
+                            placeholder="Type your question here or use voice input..." 
+                            rows="1"
+                            onkeypress="handleKeyPress(event)"
+                        ></textarea>
+                        <button class="speech-mic-btn" id="micBtn" onclick="toggleSpeech()">
+                            🎤
+                        </button>
+                    </div>
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                        ➤
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div style="background:#fbe9e7;border-left:4px solid #d84315;padding:6px 12px;margin:24px 0 0 0;font-size:13px;color:#d84315;font-weight:500;">
+        Section 3: Chat Actions & Feedback<br>
+        <span style="font-size:12px;color:#333;">
+            Export Conversation: <b>POST <a href="http://localhost:3000/api/chat/export" target="_blank">http://localhost:3000/api/chat/export</a></b><br>
+            Swagger: <a href="http://localhost:3000/api/docs#/Chat/postApiChatExport" target="_blank">/chat/export</a> (Export chat as PDF)<br>
+            Clear Chat: <b>DELETE <a href="http://localhost:3000/api/chat/sessions/:sessionId" target="_blank">http://localhost:3000/api/chat/sessions/:sessionId</a></b><br>
+            Swagger: <a href="http://localhost:3000/api/docs#/Chat/deleteApiChatSession" target="_blank">/chat/sessions/{sessionId}</a><br>
+            Submit Feedback: <b>POST <a href="http://localhost:3000/api/chat/feedback" target="_blank">http://localhost:3000/api/chat/feedback</a></b><br>
+            Swagger: <a href="http://localhost:3000/api/docs#/Chat/postApiChatFeedback" target="_blank">/chat/feedback</a>
+        </span>
+    </div>
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 4 of 13: Interactive Chatbot</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_03_query_submission.html" style="color: #2a5298; text-decoration: none;">Query Submission</a></span>
+        </div>
+        <div>
+            <a href="screen_05_query_history.html" class="nav-button">Next: Query History →</a>
+        </div>
+    </div>
+
+    <script>
+        let conversationHistory = [];
+        let isRecording = false;
+
+        // Auto-resize textarea
+        document.getElementById('chatInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Hide welcome message
+            document.getElementById('welcomeMessage').style.display = 'none';
+
+            // Add user message
+            addMessage('user', message);
+            input.value = '';
+            input.style.height = 'auto';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Simulate AI response
+            setTimeout(() => {
+                hideTypingIndicator();
+                simulateAIResponse(message);
+            }, 2000);
+        }
+
+        function addMessage(sender, text, sources = null) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            let sourcesHTML = '';
+            if (sources) {
+                sourcesHTML = `
+                    <div class="message-sources">
+                        <div class="source-title">📚 References:</div>
+                        ${sources.map(s => `<div class="source-item">${s}</div>`).join('')}
+                    </div>
+                `;
+            }
+
+            let feedbackHTML = '';
+            if (sender === 'bot') {
+                feedbackHTML = `
+                    <div class="message-feedback">
+                        <span class="feedback-text">Was this helpful?</span>
+                        <button class="feedback-btn" onclick="giveFeedback('yes')">👍 Yes</button>
+                        <button class="feedback-btn" onclick="giveFeedback('no')">👎 No</button>
+                    </div>
+                `;
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${sender === 'bot' ? '🤖' : 'AC'}</div>
+                <div class="message-content">
+                    <div class="message-bubble">${text}</div>
+                    ${sourcesHTML}
+                    ${feedbackHTML}
+                    <div class="message-time">${time}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            conversationHistory.push({ sender, text, time });
+        }
+
+        function simulateAIResponse(userMessage) {
+            const responses = {
+                'eligibility': {
+                    text: "Based on the RFP document, the eligibility criteria include:\n\n1. Minimum average annual turnover of ₹50 Crores in the last 3 financial years\n2. Experience in similar highway projects\n3. Valid registration and certifications\n4. Technical and financial capacity as per Clause 3.1",
+                    sources: ["Schedule A, Clause 3.1 - Eligibility Criteria (Page 12)", "Section II - Instructions to Bidders (Page 8)"]
+                },
+                'payment': {
+                    text: "The payment terms are structured as follows:\n\n- Monthly payments based on work progress\n- Payment within 28 days of bill submission\n- Retention money: 10% (released after defect liability period)\n- Performance guarantee: 10% of contract value\n\nPlease refer to the specific clauses for detailed payment schedule.",
+                    sources: ["Schedule B, Clause 8.2 - Payment Terms (Page 34)", "Clause 8.5 - Retention Money (Page 36)"]
+                },
+                'emd': {
+                    text: "The Earnest Money Deposit (EMD) for this project is ₹2.5 Crores.\n\nEMD Exemptions:\n- MSME registered companies (as per government guidelines)\n- Startups recognized by DPIIT\n\nEMD can be submitted in the form of Bank Guarantee or Demand Draft.",
+                    sources: ["Clause 2.4 - EMD Requirements (Page 15)", "Clause 2.4.2 - EMD Exemptions (Page 16)"]
+                },
+                'default': {
+                    text: "I understand you're asking about the RFP. For clause 11.1 of Schedule B, the RE wall chainage from 0+020 to 0+680 BHS should be followed as per the specifications mentioned. Please refer to Corrigendum-II for the modified clause 2.10 of Schedule-B which clarifies the TCS requirements.",
+                    sources: ["Schedule B, Clause 11.1 (Page 45)", "Corrigendum-II, Modified Clause 2.10 (Page 28)"]
+                }
+            };
+
+            let response = responses.default;
+            const lowerMessage = userMessage.toLowerCase();
+            
+            if (lowerMessage.includes('eligibility') || lowerMessage.includes('criteria')) {
+                response = responses.eligibility;
+            } else if (lowerMessage.includes('payment') || lowerMessage.includes('terms')) {
+                response = responses.payment;
+            } else if (lowerMessage.includes('emd') || lowerMessage.includes('earnest')) {
+                response = responses.emd;
+            }
+
+            addMessage('bot', response.text, response.sources);
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function toggleSpeech() {
+            const micBtn = document.getElementById('micBtn');
+            const input = document.getElementById('chatInput');
+            
+            isRecording = !isRecording;
+            
+            if (isRecording) {
+                micBtn.classList.add('recording');
+                // Simulate speech recognition
+                setTimeout(() => {
+                    input.value = "Kindly clarify the RE wall construction requirements mentioned in clause 11.1";
+                    micBtn.classList.remove('recording');
+                    isRecording = false;
+                }, 2000);
+            } else {
+                micBtn.classList.remove('recording');
+            }
+        }
+
+        function askQuickQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
+        }
+
+        function changeRFPContext() {
+            const select = document.getElementById('rfpContext');
+            const selectedRFP = select.options[select.selectedIndex].text;
+            addMessage('bot', `Context switched to: ${selectedRFP}. You can now ask questions specific to this RFP.`);
+        }
+
+        function giveFeedback(type) {
+            alert(`Thank you for your feedback! Your ${type === 'yes' ? 'positive' : 'constructive'} feedback helps us improve.`);
+        }
+
+        function exportConversation() {
+            alert('Conversation exported! You can download the chat history as PDF.');
+        }
+
+        function clearConversation() {
+            if (confirm('Are you sure you want to clear the conversation?')) {
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="welcome-message" id="welcomeMessage">
+                        <div class="welcome-icon">🤖</div>
+                        <h3>Welcome to AI Chatbot Assistant</h3>
+                        <p>Ask me anything about the selected RFP document.</p>
+                    </div>
+                `;
+                conversationHistory = [];
+            }
+        }
+
+        // Initialize with a bot greeting
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('welcomeMessage').style.display = 'none';
+                addMessage('bot', 'Hello! I\'m your AI assistant for RFP queries. I have access to NH-319 Arrah Bypass RFP. How can I help you today?');
+            }, 500);
+        };
+    </script>
+</body>
+</html>

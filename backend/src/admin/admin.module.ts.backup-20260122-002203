@@ -1,0 +1,38 @@
+/**
+ * NHAI Tender Query Automation System
+ * Admin Module
+ * 
+ * Purpose:
+ * - Register admin-specific controllers
+ * - Provide admin functionality
+ * - Import required dependencies
+ * 
+ * File: backend/src/admin/admin.module.ts
+ * Author: NHAI Development Team
+ * Date: January 2026
+ */
+
+import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
+import { AdminVectorizationController } from './controllers/admin-vectorization.controller';
+import { Query } from '../queries/entities/query.entity';
+import { VectorizationLog } from '../vectorization/entities/vectorization-log.entity';
+import { QueryVectorizationJob } from '../jobs/query-vectorization.job';
+import { VectorizationService } from '../vectorization/vectorization.service';
+
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([Query, VectorizationLog]),
+    HttpModule.register({
+      timeout: 30000,
+      maxRedirects: 5,
+    }),
+    ConfigModule,
+  ],
+  controllers: [AdminVectorizationController],
+  providers: [QueryVectorizationJob, VectorizationService],
+  exports: [],
+})
+export class AdminModule {}

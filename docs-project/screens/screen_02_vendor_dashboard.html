@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - Vendor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .logout-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .welcome-section {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+        }
+
+        .welcome-section h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-section p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .stat-card.total {
+            border-left-color: #2a5298;
+        }
+
+        .stat-card.answered {
+            border-left-color: #28a745;
+        }
+
+        .stat-card.pending {
+            border-left-color: #ff6b35;
+        }
+
+        .stat-card.rfps {
+            border-left-color: #6c5ce7;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            font-size: 28px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .stat-footer {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .quick-actions {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .quick-actions h3 {
+            color: #1e3c72;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 18px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            box-shadow: 0 4px 15px rgba(42, 82, 152, 0.3);
+        }
+
+        .action-btn.secondary:hover {
+            box-shadow: 0 6px 20px rgba(42, 82, 152, 0.4);
+        }
+
+        .recent-queries {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .recent-queries h3 {
+            color: #1e3c72;
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .query-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .query-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #2a5298;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .query-item:hover {
+            background: #e8f0ff;
+            transform: translateX(5px);
+        }
+
+        .query-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .query-id {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+        }
+
+        .query-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-answered {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .query-text {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .query-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .query-category {
+            background: #e8f0ff;
+            color: #2a5298;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .view-all-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .view-all-link a {
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .view-all-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .header-text h1 {
+                font-size: 16px;
+            }
+
+            .welcome-section h2 {
+                font-size: 22px;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <div class="user-info">
+                <div class="user-name">ABC Construction Ltd.</div>
+                <div class="user-role">Vendor/Bidder</div>
+            </div>
+            <div class="user-avatar">AC</div>
+            <button class="logout-btn" onclick="window.location.href='screen_01_login.html'">Logout</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h2>Welcome back, ABC Construction Ltd.</h2>
+            <p>Manage your tender queries and get instant AI-powered assistance</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-header">
+                    <span class="stat-title">Total Queries</span>
+                    <span class="stat-icon">📊</span>
+                </div>
+                <div class="stat-value">24</div>
+                <div class="stat-footer">All time submissions</div>
+            </div>
+
+            <div class="stat-card answered">
+                <div class="stat-header">
+                    <span class="stat-title">Answered</span>
+                    <span class="stat-icon">✅</span>
+                </div>
+                <div class="stat-value">18</div>
+                <div class="stat-footer">Queries resolved</div>
+            </div>
+
+            <div class="stat-card pending">
+                <div class="stat-header">
+                    <span class="stat-title">Pending</span>
+                    <span class="stat-icon">⏳</span>
+                </div>
+                <div class="stat-value">6</div>
+                <div class="stat-footer">Awaiting response</div>
+            </div>
+
+            <div class="stat-card rfps">
+                <div class="stat-header">
+                    <span class="stat-title">Active RFPs</span>
+                    <span class="stat-icon">📁</span>
+                </div>
+                <div class="stat-value">3</div>
+                <div class="stat-footer">Currently participating</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3>⚡ Quick Actions</h3>
+            <div class="action-buttons">
+                <a href="screen_03_query_submission.html" class="action-btn">
+                    <span>➕</span>
+                    <span>Submit New Query</span>
+                </a>
+                <a href="screen_05_query_history.html" class="action-btn secondary">
+                    <span>📋</span>
+                    <span>View Query History</span>
+                </a>
+                <a href="screen_04_chatbot.html" class="action-btn secondary">
+                    <span>💬</span>
+                    <span>Chat with AI Assistant</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Recent Queries -->
+        <div class="recent-queries">
+            <h3>📝 Recent Queries (Last 5)</h3>
+            <div class="query-list">
+                <div class="query-item">
+                    <div class="query-header">
+                        <span class="query-id">Query #QRY-2024-001</span>
+                        <span class="query-status status-answered">Answered</span>
+                    </div>
+                    <div class="query-text">
+                        Kindly take note of Page no. 45 of 94, clause 11.1 of Schedule B of CA, where in sl. No. 1, the chainage mentioned is 0+020 to 0+680 BHS...
+                    </div>
+                    <div class="query-footer">
+                        <span class="query-category">Technical</span>
+                        <span>Submitted: Jan 10, 2026</span>
+                    </div>
+                </div>
+
+                <div class="query-item">
+                    <div class="query-header">
+                        <span class="query-id">Query #QRY-2024-002</span>
+                        <span class="query-status status-answered">Answered</span>
+                    </div>
+                    <div class="query-text">
+                        Please clarify the geotechnical investigation report requirements for structure locations as mentioned in clause 2.5...
+                    </div>
+                    <div class="query-footer">
+                        <span class="query-category">Technical</span>
+                        <span>Submitted: Jan 9, 2026</span>
+                    </div>
+                </div>
+
+                <div class="query-item">
+                    <div class="query-header">
+                        <span class="query-id">Query #QRY-2024-003</span>
+                        <span class="query-status status-pending">Pending</span>
+                    </div>
+                    <div class="query-text">
+                        What are the EMD exemption criteria for MSME registered companies? Please provide detailed guidelines...
+                    </div>
+                    <div class="query-footer">
+                        <span class="query-category">Commercial</span>
+                        <span>Submitted: Jan 8, 2026</span>
+                    </div>
+                </div>
+
+                <div class="query-item">
+                    <div class="query-header">
+                        <span class="query-id">Query #QRY-2024-004</span>
+                        <span class="query-status status-answered">Answered</span>
+                    </div>
+                    <div class="query-text">
+                        Regarding eligibility criteria in Section 3.1, please clarify minimum turnover requirements for past 3 financial years...
+                    </div>
+                    <div class="query-footer">
+                        <span class="query-category">Eligibility</span>
+                        <span>Submitted: Jan 7, 2026</span>
+                    </div>
+                </div>
+
+                <div class="query-item">
+                    <div class="query-header">
+                        <span class="query-id">Query #QRY-2024-005</span>
+                        <span class="query-status status-pending">Pending</span>
+                    </div>
+                    <div class="query-text">
+                        Is consortium allowed for this project? If yes, what is the maximum number of partners permitted as per RFP guidelines?
+                    </div>
+                    <div class="query-footer">
+                        <span class="query-category">Contractual</span>
+                        <span>Submitted: Jan 6, 2026</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="view-all-link">
+                <a href="screen_05_query_history.html">View All Queries →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 2 of 13: Vendor Dashboard</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_01_login.html" style="color: #2a5298; text-decoration: none;">Login</a></span>
+        </div>
+        <div>
+            <a href="screen_03_query_submission.html" class="nav-button">Next: Query Submission →</a>
+        </div>
+    </div>
+</body>
+</html>

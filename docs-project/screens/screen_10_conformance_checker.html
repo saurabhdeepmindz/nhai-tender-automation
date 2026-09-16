@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - RFP Conformance Checker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #ff6b35;
+        }
+
+        .page-header-left h2 {
+            color: #1e3c72;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .page-header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            color: #1e3c72;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .upload-box {
+            border: 3px dashed #2a5298;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-box:hover {
+            background: #e8f0ff;
+            border-color: #1e3c72;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .upload-title {
+            color: #1e3c72;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        .uploaded-file {
+            background: #e8f0ff;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .file-icon {
+            font-size: 32px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .file-size {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .remove-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
+        }
+
+        .results-section {
+            display: none;
+        }
+
+        .results-section.show {
+            display: block;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .score-value {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .score-value.green {
+            color: #4ade80;
+        }
+
+        .score-value.yellow {
+            color: #fbbf24;
+        }
+
+        .score-value.red {
+            color: #f87171;
+        }
+
+        .score-subtitle {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-top: 4px solid;
+        }
+
+        .summary-card.compliant {
+            border-top-color: #28a745;
+        }
+
+        .summary-card.minor {
+            border-top-color: #ffc107;
+        }
+
+        .summary-card.major {
+            border-top-color: #ff6b35;
+        }
+
+        .summary-card.critical {
+            border-top-color: #dc3545;
+        }
+
+        .summary-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .issues-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .issues-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        .filter-btn.active {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+        }
+
+        .issue-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+            transition: all 0.3s;
+        }
+
+        .issue-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .issue-item.critical {
+            border-left-color: #dc3545;
+        }
+
+        .issue-item.major {
+            border-left-color: #ff6b35;
+        }
+
+        .issue-item.minor {
+            border-left-color: #ffc107;
+        }
+
+        .issue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .issue-title {
+            color: #1e3c72;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .issue-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .severity-badge {
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .severity-critical {
+            background: #dc3545;
+            color: white;
+        }
+
+        .severity-major {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .severity-minor {
+            background: #ffc107;
+            color: #856404;
+        }
+
+        .issue-description {
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .issue-recommendation {
+            background: #e8f0ff;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #2a5298;
+        }
+
+        .recommendation-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .recommendation-text {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .clause-comparison {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table thead {
+            background: #f8f9fa;
+        }
+
+        .comparison-table th {
+            text-align: left;
+            padding: 15px;
+            font-size: 13px;
+            color: #666;
+            font-weight: 600;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+
+        .comparison-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-icon {
+            font-size: 20px;
+            display: inline-block;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .btn-secondary:hover {
+            background: #d0e0ff;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 1200px) {
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .score-card {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                flex-wrap: wrap;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India - Admin Portal</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_06_admin_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">Rajesh Kumar</div>
+                <div class="user-role">NHAI Administrator</div>
+            </div>
+            <div class="user-avatar">RK</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h2>✓ RFP Conformance Checker</h2>
+                <p>AI-powered validation against Standard Bidding Documents (SBD) and policies</p>
+            </div>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <div class="section-title">📤 Upload Documents for Conformance Check</div>
+            
+            <div class="upload-grid">
+                <!-- RFP Upload -->
+                <div class="upload-box" onclick="document.getElementById('rfpUpload').click()">
+                    <input type="file" id="rfpUpload" style="display: none;" onchange="handleRFPUpload(event)">
+                    <div class="upload-icon">📄</div>
+                    <div class="upload-title">Upload RFP Document</div>
+                    <div class="upload-subtitle">Click to upload or drag & drop<br>PDF, DOCX (Max 50MB)</div>
+                </div>
+
+                <!-- SBD Upload -->
+                <div class="upload-box" onclick="document.getElementById('sbdUpload').click()">
+                    <input type="file" id="sbdUpload" style="display: none;" onchange="handleSBDUpload(event)">
+                    <div class="upload-icon">📋</div>
+                    <div class="upload-title">Upload Standard Bidding Document</div>
+                    <div class="upload-subtitle">Click to upload or drag & drop<br>PDF, DOCX (Max 50MB)</div>
+                </div>
+            </div>
+
+            <!-- Uploaded Files Display -->
+            <div id="uploadedFiles" style="display: none;">
+                <div class="uploaded-file">
+                    <div class="file-icon">📄</div>
+                    <div class="file-info">
+                        <div class="file-name">NH-319_Arrah_Bypass_RFP.pdf</div>
+                        <div class="file-size">8.4 MB</div>
+                    </div>
+                    <button class="remove-btn">Remove</button>
+                </div>
+
+                <div class="uploaded-file">
+                    <div class="file-icon">📋</div>
+                    <div class="file-info">
+                        <div class="file-name">SBD_Template_EPC_Mode.pdf</div>
+                        <div class="file-size">5.2 MB</div>
+                    </div>
+                    <button class="remove-btn">Remove</button>
+                </div>
+            </div>
+
+            <button class="analyze-btn" id="analyzeBtn" style="display: none;" onclick="runConformanceCheck()">
+                <span>🔍</span>
+                <span>Run Conformance Check</span>
+            </button>
+        </div>
+
+        <!-- Results Section (Hidden by default) -->
+        <div class="results-section" id="resultsSection">
+            <!-- Overall Score Card -->
+            <div class="score-card">
+                <div class="score-item">
+                    <div class="score-label">Overall Conformance Score</div>
+                    <div class="score-value green">87%</div>
+                    <div class="score-subtitle">Above Average</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Clauses Checked</div>
+                    <div class="score-value">156</div>
+                    <div class="score-subtitle">Total Clauses</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Issues Found</div>
+                    <div class="score-value yellow">21</div>
+                    <div class="score-subtitle">Requires Attention</div>
+                </div>
+            </div>
+
+            <!-- Summary Grid -->
+            <div class="summary-grid">
+                <div class="summary-card compliant">
+                    <div class="summary-icon">✅</div>
+                    <div class="summary-value">135</div>
+                    <div class="summary-label">Compliant Clauses</div>
+                </div>
+                <div class="summary-card minor">
+                    <div class="summary-icon">⚠️</div>
+                    <div class="summary-value">12</div>
+                    <div class="summary-label">Minor Issues</div>
+                </div>
+                <div class="summary-card major">
+                    <div class="summary-icon">🔶</div>
+                    <div class="summary-value">7</div>
+                    <div class="summary-label">Major Issues</div>
+                </div>
+                <div class="summary-card critical">
+                    <div class="summary-icon">🔴</div>
+                    <div class="summary-value">2</div>
+                    <div class="summary-label">Critical Issues</div>
+                </div>
+            </div>
+
+            <!-- Issues Section -->
+            <div class="issues-section">
+                <div class="issues-header">
+                    <h3 class="section-title">🔍 Identified Issues & Recommendations</h3>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterIssues('all')">All (21)</button>
+                        <button class="filter-btn" onclick="filterIssues('critical')">Critical (2)</button>
+                        <button class="filter-btn" onclick="filterIssues('major')">Major (7)</button>
+                        <button class="filter-btn" onclick="filterIssues('minor')">Minor (12)</button>
+                    </div>
+                </div>
+
+                <!-- Critical Issue 1 -->
+                <div class="issue-item critical">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">Missing Geotechnical Investigation Data</div>
+                            <div class="issue-meta">
+                                <span>📌 Section: Technical Specifications</span>
+                                <span>📄 Page: 10-12</span>
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-critical">Critical</span>
+                    </div>
+                    <div class="issue-description">
+                        The RFP does not include geotechnical investigation reports for structure locations. As per SBD template clause 4.2.1, detailed soil investigation data must be provided to bidders for foundation design and cost estimation.
+                    </div>
+                    <div class="issue-recommendation">
+                        <div class="recommendation-title">💡 Recommendation:</div>
+                        <div class="recommendation-text">
+                            Include comprehensive geotechnical reports as annexure or issue corrigendum with soil investigation data for all structure locations (bridges, culverts, retaining walls).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Issue 2 -->
+                <div class="issue-item critical">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">EMD Amount Not Specified</div>
+                            <div class="issue-meta">
+                                <span>📌 Section: Clause 2.4</span>
+                                <span>📄 Page: 15</span>
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-critical">Critical</span>
+                    </div>
+                    <div class="issue-description">
+                        The Earnest Money Deposit (EMD) amount is not clearly specified in Clause 2.4. SBD template requires explicit mention of EMD value and exemption criteria.
+                    </div>
+                    <div class="issue-recommendation">
+                        <div class="recommendation-title">💡 Recommendation:</div>
+                        <div class="recommendation-text">
+                            Specify exact EMD amount (e.g., ₹2.5 Crores) and clearly state exemption criteria for MSME/startups as per government guidelines.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Major Issue 1 -->
+                <div class="issue-item major">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">Conflicting Specifications - RE Wall vs TCS</div>
+                            <div class="issue-meta">
+                                <span>📌 Section: Schedule B, Clause 11.1 & 2.10</span>
+                                <span>📄 Page: 28, 45</span>
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-major">Major</span>
+                    </div>
+                    <div class="issue-description">
+                        Clause 11.1 (Page 45) specifies RE wall for chainage 0+020 to 0+680, but Clause 2.10 (Page 28) proposes TCS 3A for location 0.120 to 0.980. Specification conflict for location 0.020 to 0.120.
+                    </div>
+                    <div class="issue-recommendation">
+                        <div class="recommendation-title">💡 Recommendation:</div>
+                        <div class="recommendation-text">
+                            Issue corrigendum clarifying which specification applies for chainage 0.020 to 0.120. Ensure Schedule B and technical specifications are aligned.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Major Issue 2 -->
+                <div class="issue-item major">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">Payment Terms - Missing Milestone Details</div>
+                            <div class="issue-meta">
+                                <span>📌 Section: Clause 8.2</span>
+                                <span>📄 Page: 34</span>
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-major">Major</span>
+                    </div>
+                    <div class="issue-description">
+                        Payment terms mention monthly progress payments but specific milestone percentages and completion criteria are not clearly defined. SBD requires detailed payment schedule.
+                    </div>
+                    <div class="issue-recommendation">
+                        <div class="recommendation-title">💡 Recommendation:</div>
+                        <div class="recommendation-text">
+                            Add detailed payment schedule with milestone percentages (e.g., 15% on completion of earthwork, 25% on pavement layers, etc.).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Minor Issue 1 -->
+                <div class="issue-item minor">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">Ambiguous Clause Reference Numbering</div>
+                            <div class="issue-meta">
+                                <span>📌 Section: Multiple Sections</span>
+                                <span>📄 Page: Various</span>
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-minor">Minor</span>
+                    </div>
+                    <div class="issue-description">
+                        Some clauses use different numbering systems (e.g., 2.4.1 vs 2.4(a)), making cross-referencing difficult. SBD recommends consistent hierarchical numbering.
+                    </div>
+                    <div class="issue-recommendation">
+                        <div class="recommendation-title">💡 Recommendation:</div>
+                        <div class="recommendation-text">
+                            Standardize clause numbering system throughout the document following SBD template format (e.g., 1.1, 1.1.1, 1.1.2).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Minor Issue 2 -->
+                <div class="issue-item minor">
+                    <div class="issue-header">
+                        <div>
+                            <div class="issue-title">Missing Definitions for Technical Abbreviations</div>
+                            <div class="issue-meta">
+                                <span>📌 Section: Throughout Document</span>
+                                <span>📄 Page: Various</span>
+                            </div>
+                        </div>
+                        <span class="severity-badge severity-minor">Minor</span>
+                    </div>
+                    <div class="issue-description">
+                        Several technical abbreviations (TCS, RE, BHS, RHS, LHS) are used without definitions in glossary. SBD requires comprehensive definitions section.
+                    </div>
+                    <div class="issue-recommendation">
+                        <div class="recommendation-title">💡 Recommendation:</div>
+                        <div class="recommendation-text">
+                            Add definitions section or expand existing glossary to include all technical abbreviations used in the RFP.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clause-by-Clause Comparison -->
+            <div class="clause-comparison">
+                <h3 class="section-title">📋 Clause-by-Clause Conformance Analysis</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Clause No.</th>
+                            <th>Clause Title</th>
+                            <th>Status</th>
+                            <th>SBD Requirement</th>
+                            <th>RFP Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1.1</td>
+                            <td>Project Overview</td>
+                            <td><span class="status-icon">✅</span></td>
+                            <td>Mandatory - Complete</td>
+                            <td>Present and Compliant</td>
+                        </tr>
+                        <tr>
+                            <td>2.4</td>
+                            <td>EMD Requirements</td>
+                            <td><span class="status-icon">🔴</span></td>
+                            <td>Mandatory - Amount & Exemptions</td>
+                            <td>Amount Not Specified</td>
+                        </tr>
+                        <tr>
+                            <td>3.1</td>
+                            <td>Eligibility Criteria</td>
+                            <td><span class="status-icon">✅</span></td>
+                            <td>Mandatory - Financial & Technical</td>
+                            <td>Present and Compliant</td>
+                        </tr>
+                        <tr>
+                            <td>4.2.1</td>
+                            <td>Geotechnical Data</td>
+                            <td><span class="status-icon">🔴</span></td>
+                            <td>Mandatory - Soil Investigation</td>
+                            <td>Missing Data</td>
+                        </tr>
+                        <tr>
+                            <td>8.2</td>
+                            <td>Payment Terms</td>
+                            <td><span class="status-icon">🔶</span></td>
+                            <td>Mandatory - Detailed Schedule</td>
+                            <td>Partial - Missing Milestones</td>
+                        </tr>
+                        <tr>
+                            <td>11.1</td>
+                            <td>Technical Specifications</td>
+                            <td><span class="status-icon">🔶</span></td>
+                            <td>Mandatory - Consistent Specs</td>
+                            <td>Partial - Conflicts Present</td>
+                        </tr>
+                        <tr>
+                            <td>12.3</td>
+                            <td>Quality Standards</td>
+                            <td><span class="status-icon">✅</span></td>
+                            <td>Mandatory - IRC/MORT&H Refs</td>
+                            <td>Present and Compliant</td>
+                        </tr>
+                        <tr>
+                            <td>15.1</td>
+                            <td>Performance Guarantee</td>
+                            <td><span class="status-icon">✅</span></td>
+                            <td>Mandatory - 10% of Contract</td>
+                            <td>Present and Compliant</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="downloadReport()">
+                    <span>📥</span>
+                    <span>Download Full Report</span>
+                </button>
+                <button class="btn btn-secondary" onclick="alert('Exporting issues to spreadsheet...')">
+                    <span>📊</span>
+                    <span>Export Issues to Excel</span>
+                </button>
+                <button class="btn btn-primary" onclick="window.location.href='screen_11_corrigendum_generator.html'">
+                    <span>📄</span>
+                    <span>Generate Corrigendum</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 10 of 13: Conformance Checker</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_09_analytics_dashboard.html" style="color: #2a5298; text-decoration: none;">Analytics Dashboard</a></span>
+        </div>
+        <div>
+            <a href="screen_11_corrigendum_generator.html" class="nav-button">Next: Corrigendum Generator →</a>
+        </div>
+    </div>
+
+    <script>
+        function handleRFPUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('uploadedFiles').style.display = 'block';
+                checkIfBothUploaded();
+            }
+        }
+
+        function handleSBDUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                document.getElementById('uploadedFiles').style.display = 'block';
+                checkIfBothUploaded();
+            }
+        }
+
+        function checkIfBothUploaded() {
+            // Simulate checking if both files are uploaded
+            setTimeout(() => {
+                document.getElementById('analyzeBtn').style.display = 'flex';
+            }, 500);
+        }
+
+        function runConformanceCheck() {
+            // Simulate analysis
+            document.getElementById('uploadSection').style.display = 'none';
+            
+            // Show loading message
+            const loading = document.createElement('div');
+            loading.id = 'loading';
+            loading.style.cssText = 'text-align: center; padding: 60px; font-size: 18px; color: #2a5298;';
+            loading.innerHTML = '🔍 Analyzing documents... Please wait...<br><small style="font-size: 14px; color: #666; margin-top: 10px; display: block;">Running AI conformance checks</small>';
+            document.querySelector('.main-container').appendChild(loading);
+            
+            // Show results after 3 seconds
+            setTimeout(() => {
+                document.getElementById('loading').remove();
+                document.getElementById('resultsSection').classList.add('show');
+            }, 3000);
+        }
+
+        function filterIssues(type) {
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Filter logic would go here
+            console.log('Filtering issues by:', type);
+        }
+
+        function downloadReport() {
+            alert('Downloading comprehensive conformance report as PDF...');
+        }
+
+        // Simulate pre-loaded analysis for demo
+        window.onload = function() {
+            // Uncomment below to auto-show results
+            // setTimeout(() => {
+            //     document.getElementById('uploadSection').style.display = 'none';
+            //     document.getElementById('resultsSection').classList.add('show');
+            // }, 1000);
+        };
+    </script>
+</body>
+</html>

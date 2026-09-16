@@ -1,0 +1,46 @@
+# Secrets - never commit
+.env
+.env.*
+!.env*.example
+!.env copy.example
+
+# Dependencies / virtual envs
+node_modules/
+nhai-venv/
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Build output
+.next/
+dist/
+build/
+out/
+
+# Vector DB / persisted data
+chroma_db/
+query_db/
+
+# Logs
+logs/
+*.log
+
+# Database dumps / raw data exports (may contain real data)
+*.sql
+*.csv
+database-backups/
+backups/
+Staging/
+uploads/
+
+# Test artifacts (large videos/traces; kept locally for defect tracking, not in git)
+tests/frontend/e2e-history/
+frontend/playwright-report/
+frontend/test-results/
+frontend/e2e-screens/
+
+# Misc
+.DS_Store
+Thumbs.db
+*.tmp

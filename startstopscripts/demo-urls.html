@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>NHAI Tender Automation - Demo URLs</title>
+<style>
+  :root {
+    --nhai-blue: #0b3d66;
+    --nhai-blue-light: #1465a3;
+    --accent: #d97706;
+    --bg: #f4f6f9;
+    --card-bg: #ffffff;
+    --border: #dbe2ea;
+    --text: #1f2937;
+    --muted: #64748b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px 60px;
+  }
+  header {
+    max-width: 1100px;
+    margin: 0 auto 24px;
+  }
+  header h1 {
+    color: var(--nhai-blue);
+    margin: 0 0 4px;
+    font-size: 26px;
+  }
+  header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-title {
+    color: var(--nhai-blue);
+    font-size: 16px;
+    font-weight: 700;
+    margin: 32px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--nhai-blue);
+    color: #fff;
+    letter-spacing: 0.03em;
+  }
+  .section-title .badge.tech {
+    background: var(--muted);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  thead th {
+    background: var(--nhai-blue);
+    color: #fff;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  tbody td {
+    padding: 10px 14px;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px;
+    vertical-align: top;
+  }
+  tbody tr:hover {
+    background: #f8fafc;
+  }
+  td.name {
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--text);
+  }
+  td.url a {
+    color: var(--nhai-blue-light);
+    text-decoration: none;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 12.5px;
+  }
+  td.url a:hover { text-decoration: underline; }
+  td.purpose { color: var(--text); }
+  .creds {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: Consolas, "Courier New", monospace;
+    background: #f1f5f9;
+    border-radius: 4px;
+    padding: 2px 6px;
+  }
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .btn {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 5px;
+    background: var(--nhai-blue);
+    color: #fff;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--nhai-blue-light); }
+  .footer-note {
+    max-width: 1100px;
+    margin: 32px auto 0;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .footer-note code {
+    background: #f1f5f9;
+    padding: 1px 5px;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>NHAI Tender Automation - Demo URLs</h1>
+  <p>Quick reference for the customer demo. Run <code>start-all.bat</code> first, then use this page to jump straight to any screen.</p>
+</header>
+
+<div class="container">
+
+  <div class="section-title"><span class="badge">Customer Demo</span> Frontend screens (http://localhost:3000)</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:16%">Screen</th>
+        <th style="width:24%">URL</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="name">Home</td>
+        <td class="url"><a href="http://localhost:3000" target="_blank">http://localhost:3000</a></td>
+        <td class="purpose">Landing page with links to the vendor/admin apps and the static design-preview mockups.</td>
+      </tr>
+      <tr>
+        <td class="name">Login</td>
+        <td class="url"><a href="http://localhost:3000/login" target="_blank">http://localhost:3000/login</a></td>
+        <td class="purpose">Single sign-in screen for both vendor and admin demo accounts; redirects to the matching dashboard on success.
+          <div class="creds">Vendor: vendor@example.com / password123</div>
+          <div class="creds">Admin: admin@nhai.gov.in / admin123</div>
+        </td>
+      </tr>
+      <tr>
+        <td class="name">Vendor Dashboard</td>
+        <td class="url"><a href="http://localhost:3000/vendor/dashboard" target="_blank">http://localhost:3000/vendor/dashboard</a></td>
+        <td class="purpose">Vendor's home screen: RFP list (with search/filter), Total RFPs / Queries Submitted / Pending Queries stat cards (each clickable), and Recent Queries.</td>
+      </tr>
+      <tr>
+        <td class="name">Vendor Query Submission</td>
+        <td class="url"><a href="http://localhost:3000/vendor/query-submission" target="_blank">http://localhost:3000/vendor/query-submission</a></td>
+        <td class="purpose">Form for a vendor to submit a new pre-bid query against an RFP.</td>
+      </tr>
+      <tr>
+        <td class="name">Vendor Query History</td>
+        <td class="url"><a href="http://localhost:3000/vendor/query-history" target="_blank">http://localhost:3000/vendor/query-history</a></td>
+        <td class="purpose">List of a vendor's submitted queries and their status; reached from the dashboard's stat cards or an RFP's "View" action.</td>
+      </tr>
+      <tr>
+        <td class="name">Admin Dashboard</td>
+        <td class="url"><a href="http://localhost:3000/admin/dashboard" target="_blank">http://localhost:3000/admin/dashboard</a></td>
+        <td class="purpose">Central hub for the admin side, with a card per admin feature so URLs never need to be memorized.</td>
+      </tr>
+      <tr>
+        <td class="name">Admin - Historical Data</td>
+        <td class="url"><a href="http://localhost:3000/admin/historical-data" target="_blank">http://localhost:3000/admin/historical-data</a></td>
+        <td class="purpose">Upload and manage historical RFP data used to train/seed the query-matching corpus; shows the historical vs. live RFP split and upload history.</td>
+      </tr>
+      <tr>
+        <td class="name">Pre-bid Query Workflow <span style="font-weight:400;color:var(--muted);">(the key AI demo screen)</span></td>
+        <td class="url"><a href="http://localhost:3000/prebid-query/workflow" target="_blank">http://localhost:3000/prebid-query/workflow</a></td>
+        <td class="purpose">Shows the AI workflow execution for a submitted query: the generated response plus a "Similar Historical Queries" table with confidence scores, matched against previous RFPs' pre-bid query responses. This is the screen shown in the Jan/Feb customer demo.</td>
+      </tr>
+      <tr>
+        <td class="name">Pre-bid Query Management</td>
+        <td class="url"><a href="http://localhost:3000/admin/prebid-queries" target="_blank">http://localhost:3000/admin/prebid-queries</a></td>
+        <td class="purpose">Admin workspace to review/finalize pre-bid query responses: filter and search, compare AI response against past RFP reference/response, edit and save the final admin response, and update status per-row or in bulk.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="section-title"><span class="badge tech">Technical</span> Service health &amp; API docs (not for the customer demo)</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:16%">Service</th>
+        <th style="width:24%">URL</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="name">Backend API base</td>
+        <td class="url"><a href="http://localhost:3001/api" target="_blank">http://localhost:3001/api</a></td>
+        <td class="purpose">NestJS REST API root that the frontend calls (auth, vendors, queries, historical data, prebid-query workflow).</td>
+      </tr>
+      <tr>
+        <td class="name">Historical Data Service docs</td>
+        <td class="url"><a href="http://localhost:8005/docs" target="_blank">http://localhost:8005/docs</a></td>
+        <td class="purpose">FastAPI Swagger UI for the Python service that ingests and stores historical RFP documents.</td>
+      </tr>
+      <tr>
+        <td class="name">History Retriever docs (Screen 7)</td>
+        <td class="url"><a href="http://localhost:8000/docs" target="_blank">http://localhost:8000/docs</a></td>
+        <td class="purpose">FastAPI Swagger UI for the RAG service that retrieves relevant historical content from ChromaDB.</td>
+      </tr>
+      <tr>
+        <td class="name">Chief Engineer docs (Screen 8)</td>
+        <td class="url"><a href="http://localhost:8001/docs" target="_blank">http://localhost:8001/docs</a></td>
+        <td class="purpose">FastAPI Swagger UI for the agent that runs the query-matching workflow and computes confidence scores.</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<p class="footer-note">
+  Generated for use alongside <code>start-all.bat</code> / <code>stop-all.bat</code> in this same folder.
+  Service status and this URL list are also written to <code>..\logs\startup-summary.log</code> on every run.
+  If a link doesn't load, check that the corresponding service actually came up (see the summary log or that service's own log under <code>..\logs\</code>).
+</p>
+
+</body>
+</html>

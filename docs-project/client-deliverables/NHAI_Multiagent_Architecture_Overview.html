@@ -1,0 +1,852 @@
+<!doctype html>
+<title>Pre-Bid Query AI Architecture</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Archivo+Expanded:wght@700;800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#eef1ee;
+    --panel:#f9faf8;
+    --panel-2:#ffffff;
+    --ink:#182420;
+    --ink-soft:#4a5650;
+    --border:#c7d0c9;
+    --border-strong:#9fb0a6;
+    --accent-050:#e7eef4;
+    --accent-200:#a9c4db;
+    --accent-400:#5a8ab0;
+    --accent-600:#2c5f83;
+    --accent-800:#173b52;
+    --success:#2f7d4f;
+    --success-bg:#e4f1e8;
+    --warning:#a9711f;
+    --warning-bg:#f5ecd9;
+    --critical:#af3a30;
+    --critical-bg:#f6e3e0;
+    --excluded:#8b9791;
+    --excluded-bg:#e3e6e2;
+    --shadow: 0 1px 2px rgba(20,30,25,.06), 0 8px 24px -12px rgba(20,30,25,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#10171a;
+      --panel:#161f22;
+      --panel-2:#1b262a;
+      --ink:#e7ece9;
+      --ink-soft:#a8b6b0;
+      --border:#2c383b;
+      --border-strong:#3d4d51;
+      --accent-050:#17232b;
+      --accent-200:#2a4a5e;
+      --accent-400:#4c86ab;
+      --accent-600:#6fa8d8;
+      --accent-800:#bcdcf5;
+      --success:#5fc389;
+      --success-bg:#123424;
+      --warning:#d8a24c;
+      --warning-bg:#3a2c12;
+      --critical:#e88379;
+      --critical-bg:#3a1a17;
+      --excluded:#7c8a84;
+      --excluded-bg:#212b27;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#10171a;
+    --panel:#161f22;
+    --panel-2:#1b262a;
+    --ink:#e7ece9;
+    --ink-soft:#a8b6b0;
+    --border:#2c383b;
+    --border-strong:#3d4d51;
+    --accent-050:#17232b;
+    --accent-200:#2a4a5e;
+    --accent-400:#4c86ab;
+    --accent-600:#6fa8d8;
+    --accent-800:#bcdcf5;
+    --success:#5fc389;
+    --success-bg:#123424;
+    --warning:#d8a24c;
+    --warning-bg:#3a2c12;
+    --critical:#e88379;
+    --critical-bg:#3a1a17;
+    --excluded:#7c8a84;
+    --excluded-bg:#212b27;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Public Sans", -apple-system, "Segoe UI", sans-serif;
+    line-height:1.6;
+    padding-inline:20px;
+  }
+  a{color:var(--accent-600)}
+  h1,h2,h3{font-family:"Archivo Expanded","Archivo",sans-serif; text-wrap:balance; margin:0 0 .4em; letter-spacing:.01em}
+  .wrap{max-width:1160px; margin:0 auto}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--accent-600);
+    font-weight:600;
+  }
+  code, .mono{font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- Doc header / cover ---------- */
+  .doc-head{
+    padding-block:36px 22px;
+    border-bottom:2px solid var(--border-strong);
+  }
+  .doc-head-top{
+    display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;
+  }
+  .doc-title h1{font-size:clamp(1.6rem, 1.1rem + 2vw, 2.6rem); max-width:18ch}
+  .doc-title p{margin:.5em 0 0; color:var(--ink-soft); max-width:52ch; font-size:1.02rem}
+  .doc-control{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:12px 16px;
+    display:grid;
+    grid-template-columns:auto auto;
+    gap:4px 16px;
+    min-width:250px;
+  }
+  .doc-control dt{opacity:.75}
+  .doc-control dd{margin:0; color:var(--ink); font-weight:600; text-align:right}
+  .classification{
+    display:inline-block; margin-top:14px;
+    font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--warning); background:var(--warning-bg); border:1px solid var(--warning);
+    padding:4px 10px; border-radius:3px;
+  }
+
+  /* ---------- Sheet index ---------- */
+  .index{
+    display:flex; flex-wrap:wrap; gap:8px;
+    padding-block:16px;
+    border-bottom:1px solid var(--border);
+    margin-bottom:8px;
+  }
+  .index a{
+    font-family:"IBM Plex Mono",monospace; font-size:11.5px; text-decoration:none;
+    color:var(--ink-soft); background:var(--panel); border:1px solid var(--border);
+    padding:5px 10px; border-radius:14px; white-space:nowrap;
+  }
+  .index a b{color:var(--accent-600); font-weight:600; margin-right:5px}
+  .index a:hover{border-color:var(--accent-400); color:var(--ink)}
+
+  /* ---------- Sections ---------- */
+  section{padding-block:38px; border-bottom:1px solid var(--border)}
+  section:last-of-type{border-bottom:none}
+  .section-head{display:flex; gap:16px; align-items:baseline; margin-bottom:18px; flex-wrap:wrap}
+  .section-head h2{font-size:clamp(1.25rem,1.05rem + .8vw,1.7rem)}
+  .lede{font-size:1.05rem; color:var(--ink-soft); max-width:74ch; margin:0 0 20px}
+  .prose{max-width:74ch}
+  .prose p{margin:0 0 1em}
+
+  /* ---------- Cards / grids ---------- */
+  .grid{display:grid; gap:16px}
+  .grid-2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .grid-3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .card{
+    background:var(--panel); border:1px solid var(--border); border-radius:10px;
+    padding:18px 20px; box-shadow:var(--shadow);
+  }
+  .card h3{font-size:1.02rem; margin-bottom:.35em}
+  .card p{margin:0; color:var(--ink-soft); font-size:.94rem}
+  .card .tag{
+    display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:10px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--accent-600); background:var(--accent-050);
+    border:1px solid var(--accent-200); border-radius:4px; padding:2px 7px; margin-bottom:8px;
+  }
+
+  /* ---------- Diagrams ---------- */
+  figure{margin:0 0 8px}
+  .diagram-scroll{
+    overflow-x:auto; overflow-y:hidden;
+    background:var(--panel-2); border:1px solid var(--border); border-radius:10px;
+    padding:18px 10px; box-shadow:var(--shadow);
+  }
+  .diagram-scroll svg{display:block; margin:0 auto; color:var(--ink)}
+  figcaption{
+    margin-top:10px; font-size:.86rem; color:var(--ink-soft); font-style:italic; max-width:74ch;
+  }
+
+  /* ---------- Tables ---------- */
+  .table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:10px; box-shadow:var(--shadow)}
+  table{border-collapse:collapse; width:100%; min-width:640px; background:var(--panel-2)}
+  th,td{text-align:left; padding:10px 14px; border-bottom:1px solid var(--border); font-size:.92rem; vertical-align:top}
+  thead th{
+    font-family:"IBM Plex Mono",monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--ink-soft); background:var(--panel); font-weight:600;
+  }
+  tbody tr:last-child td{border-bottom:none}
+  td.num{font-variant-numeric:tabular-nums; font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- Pills / status ---------- */
+  .pill{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family:"IBM Plex Mono",monospace; font-size:11px; font-weight:600;
+    padding:4px 10px; border-radius:12px; border:1px solid transparent; white-space:nowrap;
+  }
+  .pill::before{content:""; width:6px; height:6px; border-radius:50%; background:currentColor}
+  .pill-built{color:var(--success); background:var(--success-bg); border-color:var(--success)}
+  .pill-progress{color:var(--warning); background:var(--warning-bg); border-color:var(--warning)}
+  .pill-planned{color:var(--excluded); background:var(--excluded-bg); border-color:var(--excluded)}
+  .pill-status{color:var(--accent-600); background:var(--accent-050); border-color:var(--accent-200)}
+
+  .flow-strip{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    padding:16px; background:var(--panel); border:1px solid var(--border); border-radius:10px;
+  }
+  .flow-strip .arrow{color:var(--ink-soft); font-family:"IBM Plex Mono",monospace}
+
+  .callout{
+    display:flex; gap:16px; padding:18px 20px; border-radius:10px;
+    background:var(--accent-050); border:1px solid var(--accent-200);
+  }
+  .callout .icon{
+    flex:none; width:34px; height:34px; border-radius:50%; background:var(--accent-600); color:var(--panel-2);
+    display:flex; align-items:center; justify-content:center; font-family:"Archivo",sans-serif; font-weight:800; font-size:15px;
+  }
+  .callout h3{margin:0 0 6px; font-size:1.02rem}
+  .callout p{margin:0; color:var(--ink-soft); font-size:.94rem}
+
+  /* ---------- Worked-example trace ---------- */
+  .trace-head{display:flex; align-items:center; gap:10px; margin-bottom:10px}
+  .trace-head h3{margin:0; font-size:1.05rem}
+  .step-badge{
+    display:inline-flex; align-items:center; justify-content:center; flex:none;
+    width:27px; height:27px; border-radius:50%; background:var(--accent-600); color:var(--panel-2);
+    font-family:"Archivo",sans-serif; font-weight:800; font-size:13px;
+  }
+  .quote{
+    margin:0 0 12px; padding:10px 14px; background:var(--accent-050);
+    border-left:3px solid var(--accent-400); border-radius:0 6px 6px 0;
+    font-size:.92rem; font-style:italic;
+  }
+  .kv{display:grid; grid-template-columns:max-content 1fr; gap:5px 14px; font-family:"IBM Plex Mono",monospace; font-size:11.5px; margin:0}
+  .kv dt{color:var(--ink-soft)}
+  .kv dd{margin:0; color:var(--ink)}
+
+  footer{padding-block:30px 50px; color:var(--ink-soft); font-size:.85rem}
+  footer .doc-control{margin-top:14px}
+
+  @media (max-width:640px){
+    .doc-head-top{flex-direction:column}
+    .doc-control{width:100%}
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="doc-head">
+    <div class="doc-head-top">
+      <div class="doc-title">
+        <p class="eyebrow">NHAI Tender Automation &middot; Proof of Concept</p>
+        <h1>Pre-Bid Query Automation &mdash; Multi-Agent AI Architecture</h1>
+        <p>How vendor pre-bid queries are matched against historical RFP responses, drafted by AI with a transparent confidence score, and released only after officer review.</p>
+        <span class="classification">Client review copy &middot; confidential</span>
+      </div>
+      <dl class="doc-control">
+        <dt>Doc ref</dt><dd>NHAI&#8209;POC&#8209;ARCH&#8209;01</dd>
+        <dt>Version</dt><dd>1.0</dd>
+        <dt>Date</dt><dd>16 Sep 2026</dd>
+        <dt>Prepared by</dt><dd>Engineering &mdash; PoC Team</dd>
+        <dt>Audience</dt><dd>Technical &amp; Business</dd>
+      </dl>
+    </div>
+  </header>
+
+  <nav class="index" aria-label="Section index">
+    <a href="#summary"><b>01</b>Summary</a>
+    <a href="#landscape"><b>02</b>System Landscape</a>
+    <a href="#lifecycle"><b>03</b>Query Lifecycle</a>
+    <a href="#agents"><b>04</b>Inside the Agents</a>
+    <a href="#confidence"><b>05</b>Confidence Scoring</a>
+    <a href="#example"><b>06</b>Worked Example</a>
+    <a href="#governance"><b>07</b>Human-in-the-Loop</a>
+    <a href="#patterns"><b>08</b>Design Patterns</a>
+    <a href="#stack"><b>09</b>Technology Stack</a>
+    <a href="#status"><b>10</b>Implementation Status</a>
+  </nav>
+
+  <!-- 01 SUMMARY -->
+  <section id="summary">
+    <div class="section-head"><span class="eyebrow">01</span><h2>Executive Summary</h2></div>
+    <div class="prose">
+      <p>Every road-project tender draws pre-bid queries from vendors &mdash; many of them near-duplicates of questions NHAI has already answered in a previous RFP. Today that matching is manual: an engineer re-reads old corrigenda and reply documents to check whether a question has a precedent. This system automates that first pass.</p>
+      <p>A vendor's query is automatically compared, using AI, against a searchable archive of previously answered pre-bid queries and historical RFP documents. The system proposes a draft reply and shows exactly how confident it is and which past answer it drew from. <strong>No reply reaches a vendor without a human officer reviewing and approving it</strong> &mdash; the AI drafts, NHAI decides.</p>
+    </div>
+    <div class="grid grid-3" style="margin-top:22px">
+      <div class="card"><span class="tag">Speed</span><h3>Minutes, not days</h3><p>Draft answers with sourced precedent are ready for review as soon as a query is submitted, instead of an officer searching past tenders by hand.</p></div>
+      <div class="card"><span class="tag">Traceability</span><h3>Every draft is sourced</h3><p>Each AI answer carries a confidence score and a link back to the specific historical query/response it was built from.</p></div>
+      <div class="card"><span class="tag">Control</span><h3>Officer has final say</h3><p>An authorised reviewer can accept, edit, or replace the AI draft with a different historical precedent before anything is published.</p></div>
+    </div>
+  </section>
+
+  <!-- 02 SYSTEM LANDSCAPE -->
+  <section id="landscape">
+    <div class="section-head"><span class="eyebrow">02</span><h2>System Landscape</h2></div>
+    <p class="lede">Four layers, each with one job: the portals people use, the application server that owns business rules, a set of independent Python AI services that do the retrieval-and-drafting work, and the models &amp; data stores underneath them.</p>
+
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 1120 705" width="1120" height="705" role="img" aria-label="Layered system architecture: client layer (vendor portal, admin dashboard) calls the NestJS application layer (query APIs, admin APIs, scheduled vectorization job, document upload queue), which calls the Python AI services layer (History Retriever Agent, Chief Engineer Agent, Historical Data Ingestion Service), which reads and writes the model and data layer (Ollama LLM runtime, embeddings, PostgreSQL, ChromaDB).">
+        <defs>
+          <marker id="arrowE" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-600)"></path>
+          </marker>
+        </defs>
+
+        <!-- Band 1: Client -->
+        <rect x="40" y="30" width="1040" height="110" rx="10" fill="var(--panel)" stroke="var(--border-strong)" stroke-dasharray="3 4"></rect>
+        <text x="62" y="52" class="mono" font-size="11" letter-spacing="1.5" fill="var(--accent-600)" font-weight="600">01 &mdash; CLIENT LAYER (NEXT.JS)</text>
+        <g font-family="Archivo, sans-serif">
+          <rect x="60" y="68" width="470" height="56" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="295" y="92" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">Vendor Portal</text>
+          <text x="295" y="110" text-anchor="middle" class="mono" font-size="10" fill="var(--ink-soft)">submit &amp; track pre-bid queries</text>
+
+          <rect x="590" y="68" width="470" height="56" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="825" y="92" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)">Admin Dashboard</text>
+          <text x="825" y="110" text-anchor="middle" class="mono" font-size="10" fill="var(--ink-soft)">review, approve, publish replies</text>
+        </g>
+
+        <line x1="560" y1="140" x2="560" y2="178" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowE)"></line>
+        <text x="580" y="163" class="mono" font-size="10.5" fill="var(--ink-soft)">REST / HTTPS, JWT-authenticated</text>
+
+        <!-- Band 2: Application -->
+        <rect x="40" y="180" width="1040" height="150" rx="10" fill="var(--panel)" stroke="var(--border-strong)" stroke-dasharray="3 4"></rect>
+        <text x="62" y="202" class="mono" font-size="11" letter-spacing="1.5" fill="var(--accent-600)" font-weight="600">02 &mdash; APPLICATION LAYER (NESTJS BACKEND)</text>
+        <g font-family="Archivo, sans-serif">
+          <rect x="60" y="218" width="235" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="177" y="248" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Query &amp; Vendor APIs</text>
+          <text x="177" y="266" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">submission, status,</text>
+          <text x="177" y="280" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">history</text>
+
+          <rect x="315" y="218" width="235" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="432" y="248" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Admin &amp; Workflow APIs</text>
+          <text x="432" y="266" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">review, approve,</text>
+          <text x="432" y="280" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">override decisions</text>
+
+          <rect x="570" y="218" width="235" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="687" y="248" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Vectorization Scheduler</text>
+          <text x="687" y="266" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">cron job, polls new</text>
+          <text x="687" y="280" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">queries every few seconds</text>
+
+          <rect x="825" y="218" width="235" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="942" y="248" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Document Upload Queue</text>
+          <text x="942" y="266" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">Bull + Redis, for</text>
+          <text x="942" y="280" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">historical-data ingestion</text>
+        </g>
+
+        <line x1="560" y1="330" x2="560" y2="368" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowE)"></line>
+        <text x="580" y="353" class="mono" font-size="10.5" fill="var(--ink-soft)">HTTP calls to agent APIs, on submit or schedule</text>
+
+        <!-- Band 3: AI services -->
+        <rect x="40" y="370" width="1040" height="140" rx="10" fill="var(--panel)" stroke="var(--border-strong)" stroke-dasharray="3 4"></rect>
+        <text x="62" y="392" class="mono" font-size="11" letter-spacing="1.5" fill="var(--accent-600)" font-weight="600">03 &mdash; AI SERVICES LAYER (PYTHON &middot; FASTAPI)</text>
+        <g font-family="Archivo, sans-serif">
+          <rect x="60" y="408" width="320" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="220" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">History Retriever Agent</text>
+          <text x="220" y="454" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">Screen 7 &middot; searches historical</text>
+          <text x="220" y="468" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">RFP document corpus</text>
+
+          <rect x="400" y="408" width="320" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="560" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Chief Engineer Agent</text>
+          <text x="560" y="454" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">Screen 8 &middot; matches queries,</text>
+          <text x="560" y="468" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">scores confidence, drafts reply</text>
+
+          <rect x="740" y="408" width="320" height="76" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="900" y="436" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Historical Data Ingestion</text>
+          <text x="900" y="454" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">parses &amp; embeds past RFPs,</text>
+          <text x="900" y="468" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">corrigenda, Q&amp;A on upload</text>
+        </g>
+        <text x="560" y="500" text-anchor="middle" class="mono" font-size="10" font-style="italic" fill="var(--ink-soft)">all three share one toolkit: LangChain prompt templates &middot; text splitter &middot; embeddings wrapper</text>
+
+        <line x1="560" y1="510" x2="560" y2="565" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowE)"></line>
+        <text x="580" y="542" class="mono" font-size="10.5" fill="var(--ink-soft)">embed &rarr; vector search &rarr; generate</text>
+
+        <!-- Band 4: Model & Data -->
+        <rect x="40" y="575" width="1040" height="110" rx="10" fill="var(--panel)" stroke="var(--border-strong)" stroke-dasharray="3 4"></rect>
+        <text x="62" y="597" class="mono" font-size="11" letter-spacing="1.5" fill="var(--accent-600)" font-weight="600">04 &mdash; MODEL &amp; DATA LAYER</text>
+        <g font-family="Archivo, sans-serif">
+          <rect x="60" y="613" width="235" height="56" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="177" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Ollama LLM Runtime</text>
+          <text x="177" y="655" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">phi &middot; gemma3:1b (local)</text>
+
+          <rect x="315" y="613" width="235" height="56" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="432" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Embeddings</text>
+          <text x="432" y="655" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">nomic-embed-text</text>
+
+          <rect x="570" y="613" width="235" height="56" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="687" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">PostgreSQL</text>
+          <text x="687" y="655" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">queries &middot; vendors &middot; workflow</text>
+
+          <rect x="825" y="613" width="235" height="56" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <text x="942" y="637" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">ChromaDB</text>
+          <text x="942" y="655" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">3 vector collections</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>The application layer never calls a model directly &mdash; it always goes through one of the three AI services, each of which is independently deployable and replaceable (e.g. swapping the local LLM for a hosted one later).</figcaption>
+  </section>
+
+  <!-- 03 LIFECYCLE -->
+  <section id="lifecycle">
+    <div class="section-head"><span class="eyebrow">03</span><h2>End-to-End Query Lifecycle</h2></div>
+    <p class="lede">What happens, in order, from the moment a vendor types a question to the moment they receive an official answer.</p>
+
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 1480 260" width="1480" height="260" role="img" aria-label="Six-stage lifecycle: vendor submits query, logged as pending in PostgreSQL, auto-vectorized by a scheduled job into ChromaDB, AI drafts a response via the Chief Engineer Agent, officer reviews and approves on the admin dashboard, vendor receives the answer.">
+        <defs>
+          <marker id="arrowA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-600)"></path>
+          </marker>
+        </defs>
+        <!-- boxes at x: 20,270,520,770,1020,1270 width 190 -->
+        <g font-family="Archivo, sans-serif">
+          <!-- 1 -->
+          <rect x="20" y="70" width="190" height="100" rx="8" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="38" cy="54" r="14" fill="var(--accent-600)"></circle>
+          <text x="38" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="var(--panel-2)">1</text>
+          <text x="115" y="108" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Vendor Submits</text>
+          <text x="115" y="124" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Query</text>
+          <text x="115" y="148" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">Vendor Portal</text>
+
+          <!-- 2 -->
+          <rect x="270" y="70" width="190" height="100" rx="8" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="288" cy="54" r="14" fill="var(--accent-600)"></circle>
+          <text x="288" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="var(--panel-2)">2</text>
+          <text x="365" y="108" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Logged as</text>
+          <text x="365" y="124" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Pending</text>
+          <text x="365" y="148" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">PostgreSQL: queries</text>
+
+          <!-- 3 -->
+          <rect x="520" y="70" width="190" height="100" rx="8" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="538" cy="54" r="14" fill="var(--accent-600)"></circle>
+          <text x="538" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="var(--panel-2)">3</text>
+          <text x="615" y="108" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Auto-</text>
+          <text x="615" y="124" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Vectorized</text>
+          <text x="615" y="148" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">embed &rarr; ChromaDB</text>
+
+          <!-- 4 -->
+          <rect x="770" y="70" width="190" height="100" rx="8" fill="var(--panel-2)" stroke="var(--accent-600)" stroke-width="1.5"></rect>
+          <rect x="906" y="78" width="46" height="16" rx="8" fill="var(--accent-050)" stroke="var(--accent-400)"></rect>
+          <text x="929" y="90" text-anchor="middle" class="mono" font-size="7.5" font-weight="700" fill="var(--accent-600)" letter-spacing="0.5">AGENT</text>
+          <circle cx="788" cy="54" r="14" fill="var(--accent-600)"></circle>
+          <text x="788" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="var(--panel-2)">4</text>
+          <text x="865" y="112" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">AI Drafts a</text>
+          <text x="865" y="128" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Response</text>
+          <text x="865" y="152" text-anchor="middle" class="mono" font-size="9.5" fill="var(--accent-600)" font-weight="600">Chief Engineer Agent</text>
+
+          <!-- 5 -->
+          <rect x="1020" y="70" width="190" height="100" rx="8" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="1038" cy="54" r="14" fill="var(--accent-600)"></circle>
+          <text x="1038" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="var(--panel-2)">5</text>
+          <text x="1115" y="108" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Officer Reviews</text>
+          <text x="1115" y="124" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">&amp; Approves</text>
+          <text x="1115" y="148" text-anchor="middle" class="mono" font-size="9.5" fill="var(--ink-soft)">Admin Dashboard</text>
+
+          <!-- 6 -->
+          <rect x="1270" y="70" width="190" height="100" rx="8" fill="var(--panel-2)" stroke="var(--success)"></rect>
+          <circle cx="1288" cy="54" r="14" fill="var(--success)"></circle>
+          <text x="1288" y="59" text-anchor="middle" font-size="13" font-weight="800" fill="var(--panel-2)">6</text>
+          <text x="1365" y="108" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Vendor Receives</text>
+          <text x="1365" y="124" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink)">Answer</text>
+          <text x="1365" y="148" text-anchor="middle" class="mono" font-size="9.5" fill="var(--success)">status: answered</text>
+        </g>
+
+        <g class="mono" font-size="9.5" fill="var(--ink-soft)">
+          <line x1="210" y1="120" x2="270" y2="120" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowA)"></line>
+          <text x="240" y="112" text-anchor="middle">row</text>
+
+          <line x1="460" y1="120" x2="520" y2="120" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowA)"></line>
+          <text x="490" y="112" text-anchor="middle">~5s poll</text>
+
+          <line x1="710" y1="120" x2="770" y2="120" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowA)"></line>
+          <text x="740" y="112" text-anchor="middle">draft</text>
+
+          <line x1="960" y1="120" x2="1020" y2="120" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowA)"></line>
+          <text x="990" y="112" text-anchor="middle">score</text>
+
+          <line x1="1210" y1="120" x2="1270" y2="120" stroke="var(--accent-600)" stroke-width="2" marker-end="url(#arrowA)"></line>
+          <text x="1240" y="112" text-anchor="middle">reply</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Submission (steps 1&ndash;2) and drafting (steps 3&ndash;4) are decoupled: a vendor's screen never waits on the AI, because a background scheduler picks up new queries independently. Only step 4 (outlined, tagged <strong>AGENT</strong>) hands the query to an autonomous AI agent &mdash; the <strong>Chief Engineer Agent</strong>; every other step is deterministic application code with no model in the loop. See <a href="#example">Worked Example</a> for a concrete run through this pipeline.</figcaption>
+  </section>
+
+  <!-- 04 INSIDE THE AGENTS -->
+  <section id="agents">
+    <div class="section-head"><span class="eyebrow">04</span><h2>Inside the Chief Engineer Agent</h2></div>
+    <p class="lede">Step 4 of the lifecycle above &mdash; "AI Drafts a Response" &mdash; is itself a six-step pipeline. This is the core of the system's retrieval-augmented generation (RAG) design.</p>
+
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 1480 200" width="1480" height="200" role="img" aria-label="Six internal steps of the Chief Engineer Agent: classify query, search historical RFPs (phase 2), match similar past queries by cosine similarity, aggregate context, generate a draft with a tiered prompt strategy, and score confidence with an explainability trace.">
+        <defs>
+          <marker id="arrowB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"></path>
+          </marker>
+        </defs>
+        <g font-family="Archivo, sans-serif">
+          <!-- step boxes x: 30,274,518,762,1006,1250 w=200 -->
+          <rect x="30" y="70" width="200" height="70" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="46" cy="55" r="13" fill="var(--accent-600)"></circle>
+          <text x="46" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="var(--panel-2)">1</text>
+          <text x="130" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Classify Query</text>
+          <text x="130" y="115" text-anchor="middle" class="mono" font-size="9" fill="var(--ink-soft)">category &middot; intent (LLM)</text>
+
+          <rect x="274" y="70" width="200" height="70" rx="7" fill="var(--panel-2)" stroke="var(--warning)" stroke-dasharray="4 3"></rect>
+          <circle cx="290" cy="55" r="13" fill="var(--warning)"></circle>
+          <text x="290" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="var(--panel-2)">2</text>
+          <text x="374" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Search Historical</text>
+          <text x="374" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">RFPs</text>
+          <text x="374" y="130" text-anchor="middle" class="mono" font-size="8.5" fill="var(--warning)">calls History Retriever Agent</text>
+
+          <rect x="518" y="70" width="200" height="70" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="534" cy="55" r="13" fill="var(--accent-600)"></circle>
+          <text x="534" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="var(--panel-2)">3</text>
+          <text x="618" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Match Similar</text>
+          <text x="618" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Past Queries</text>
+          <text x="618" y="130" text-anchor="middle" class="mono" font-size="9" fill="var(--ink-soft)">cosine similarity</text>
+
+          <rect x="762" y="70" width="200" height="70" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="778" cy="55" r="13" fill="var(--accent-600)"></circle>
+          <text x="778" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="var(--panel-2)">4</text>
+          <text x="862" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Aggregate</text>
+          <text x="862" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Context</text>
+          <text x="862" y="130" text-anchor="middle" class="mono" font-size="9" fill="var(--ink-soft)">quality: poor&rarr;excellent</text>
+
+          <rect x="1006" y="70" width="200" height="70" rx="7" fill="var(--panel-2)" stroke="var(--border)"></rect>
+          <circle cx="1022" cy="55" r="13" fill="var(--accent-600)"></circle>
+          <text x="1022" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="var(--panel-2)">5</text>
+          <text x="1106" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Generate</text>
+          <text x="1106" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Draft</text>
+          <text x="1106" y="130" text-anchor="middle" class="mono" font-size="9" fill="var(--ink-soft)">tiered prompt, local LLM</text>
+
+          <rect x="1250" y="70" width="200" height="70" rx="7" fill="var(--panel-2)" stroke="var(--success)"></rect>
+          <circle cx="1266" cy="55" r="13" fill="var(--success)"></circle>
+          <text x="1266" y="60" text-anchor="middle" font-size="12" font-weight="800" fill="var(--panel-2)">6</text>
+          <text x="1350" y="96" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Score</text>
+          <text x="1350" y="112" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink)">Confidence</text>
+          <text x="1350" y="130" text-anchor="middle" class="mono" font-size="9" fill="var(--success)">+ explainability trace</text>
+        </g>
+        <g stroke="var(--ink-soft)" stroke-width="1.6">
+          <line x1="230" y1="105" x2="274" y2="105" marker-end="url(#arrowB)"></line>
+          <line x1="474" y1="105" x2="518" y2="105" marker-end="url(#arrowB)"></line>
+          <line x1="718" y1="105" x2="762" y2="105" marker-end="url(#arrowB)"></line>
+          <line x1="962" y1="105" x2="1006" y2="105" marker-end="url(#arrowB)"></line>
+          <line x1="1206" y1="105" x2="1250" y2="105" marker-end="url(#arrowB)"></line>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Step 2 (dashed, amber) is coded and wired but currently held back for phase 2 &mdash; today the agent draws only on the matched-query archive (step 3). See <a href="#status">Implementation Status</a>.</figcaption>
+
+    <div class="grid grid-2" style="margin-top:22px">
+      <div class="card">
+        <span class="tag">Screen 7</span>
+        <h3>History Retriever Agent</h3>
+        <p>Owns the historical RFP / corrigendum / Q&amp;A document corpus. Splits uploaded documents into chunks, embeds them, and will supply document-level precedent to the Chief Engineer Agent once phase 2 is switched on.</p>
+      </div>
+      <div class="card">
+        <span class="tag">Screen 8</span>
+        <h3>Chief Engineer Agent</h3>
+        <p>The decision-making agent. Runs the six steps above for every new query, and is the only service that talks directly to the local LLM to author a reply.</p>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:16px">
+      <div class="icon">Q</div>
+      <div>
+        <h3>Answer-quality scoring &mdash; RAGAS</h3>
+        <p>Yes, this is still in the codebase and running: every historical-document search the <strong>History Retriever Agent</strong> performs is automatically scored with the <a href="https://github.com/explodinggradients/ragas" target="_blank" rel="noopener">RAGAS</a> framework &mdash; <em>faithfulness</em> (does the retrieved text actually support the answer?) and <em>answer relevancy</em> &mdash; and the scores are logged for quality monitoring. It isn&rsquo;t connected to the live vendor-query path yet, because that path doesn&rsquo;t call the History Retriever Agent until step 2 above is activated in phase 2. Reconnecting RAGAS scoring end-to-end is part of that same phase-2 activation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 CONFIDENCE -->
+  <section id="confidence">
+    <div class="section-head"><span class="eyebrow">05</span><h2>Confidence Scoring &amp; Response Strategy</h2></div>
+    <p class="lede">Confidence isn't a separate opinion from the AI &mdash; it <em>is</em> the similarity score between the new query and the closest matching past query. That single number then decides how much liberty the AI is allowed to take when writing the reply.</p>
+
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 1200 190" width="1200" height="190" role="img" aria-label="Confidence scale from 0 to 1: below 0.50 excluded from grounding, 0.50 to 0.70 context-informed and caveated, 0.70 to 0.80 synthesis of multiple precedents, 0.80 to 0.95 paraphrase of one strong precedent, 0.95 and above verbatim reuse of the prior answer.">
+        <g font-family="Archivo, sans-serif">
+          <!-- track from x=60 to x=1140, width 1080 => scale 1080 per 1.0 -->
+          <rect x="60" y="60" width="378" height="40" fill="var(--excluded-bg)" stroke="var(--border)"></rect>
+          <rect x="438" y="60" width="216" height="40" fill="var(--accent-050)" stroke="var(--border)"></rect>
+          <rect x="654" y="60" width="108" height="40" fill="var(--accent-200)" stroke="var(--border)"></rect>
+          <rect x="762" y="60" width="162" height="40" fill="var(--accent-400)" stroke="var(--border)"></rect>
+          <rect x="924" y="60" width="216" height="40" fill="var(--accent-600)" stroke="var(--border)"></rect>
+
+          <!-- ticks -->
+          <g class="mono" font-size="10.5" fill="var(--ink-soft)">
+            <text x="60" y="118">0.0</text>
+            <text x="438" y="118" text-anchor="middle">0.50</text>
+            <text x="654" y="118" text-anchor="middle">0.70</text>
+            <text x="762" y="118" text-anchor="middle">0.80</text>
+            <text x="924" y="118" text-anchor="middle">0.95</text>
+            <text x="1140" y="118" text-anchor="end">1.0</text>
+          </g>
+
+          <!-- zone labels -->
+          <g font-size="11.5" font-weight="700">
+            <text x="249" y="46" text-anchor="middle" fill="var(--excluded)">Excluded</text>
+            <text x="546" y="46" text-anchor="middle" fill="var(--accent-600)">Context&#8209;Informed</text>
+            <text x="708" y="46" text-anchor="middle" fill="var(--accent-600)">Synthesis</text>
+            <text x="843" y="46" text-anchor="middle" fill="var(--panel-2)">Paraphrase</text>
+            <text x="1032" y="46" text-anchor="middle" fill="var(--panel-2)">Verbatim Reuse</text>
+          </g>
+          <g class="mono" font-size="9" fill="var(--ink-soft)">
+            <text x="249" y="145" text-anchor="middle">not used as</text>
+            <text x="249" y="157" text-anchor="middle">grounding evidence</text>
+            <text x="546" y="145" text-anchor="middle">weak precedent,</text>
+            <text x="546" y="157" text-anchor="middle">flagged for review</text>
+            <text x="708" y="145" text-anchor="middle">blends several</text>
+            <text x="708" y="157" text-anchor="middle">related answers</text>
+            <text x="843" y="145" text-anchor="middle">reworded from one</text>
+            <text x="843" y="157" text-anchor="middle">strong precedent</text>
+            <text x="1032" y="145" text-anchor="middle">near-identical past</text>
+            <text x="1032" y="157" text-anchor="middle">query &amp; answer</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <figcaption>Thresholds as implemented today (illustrative rounding of internal cut-offs 0.50 / 0.70 / 0.80 / 0.95). Every draft carries its exact score and the source query it matched.</figcaption>
+
+    <div class="table-scroll" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Confidence band</th><th>Strategy</th><th>What the officer sees</th></tr></thead>
+        <tbody>
+          <tr><td class="num">&ge; 0.95</td><td>Verbatim reuse</td><td>The prior answer, presented as a ready-to-approve draft.</td></tr>
+          <tr><td class="num">0.80 &ndash; 0.95</td><td>Paraphrase</td><td>One strong precedent, reworded to fit the new question&rsquo;s wording.</td></tr>
+          <tr><td class="num">0.70 &ndash; 0.80</td><td>Synthesis</td><td>Draft blended from more than one related past answer.</td></tr>
+          <tr><td class="num">0.50 &ndash; 0.70</td><td>Context&#8209;informed</td><td>Draft generated from thin evidence &mdash; visibly caveated, review recommended.</td></tr>
+          <tr><td class="num">&lt; 0.50</td><td>Excluded</td><td>No precedent used; routed straight to manual drafting.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 06 WORKED EXAMPLE -->
+  <section id="example">
+    <div class="section-head"><span class="eyebrow">06</span><h2>Worked Example: One Query, Start to Finish</h2></div>
+    <p class="lede">A single query traced through every stage of the lifecycle, followed by a closer look at how step&nbsp;3 actually picks its match.</p>
+
+    <div class="callout" style="background:var(--warning-bg); border-color:var(--warning); margin-bottom:24px">
+      <div class="icon" style="background:var(--warning)">!</div>
+      <div>
+        <h3>Illustrative example &mdash; synthetic data</h3>
+        <p>The vendor name, query text, RFP references, and figures below are constructed for this walkthrough. They are not drawn from any real bidder, tender, or NHAI record, though the scenario (a joint&#8209;venture turnover eligibility query) is representative of a real, common pre-bid query type.</p>
+      </div>
+    </div>
+
+    <div class="grid" style="gap:14px">
+
+      <div class="card">
+        <div class="trace-head"><span class="step-badge">1</span><h3>Vendor Submits Query</h3><span class="pill pill-status" style="margin-left:auto">Vendor Portal</span></div>
+        <p class="quote">&ldquo;For eligibility under Clause 2.2.2, can two JV partners combine their individual Average Annual Turnover (AAT) to meet the minimum AAT criteria?&rdquo;</p>
+        <dl class="kv">
+          <dt>vendor</dt><dd>M/s Highway Builders JV</dd>
+          <dt>rfp_ref</dt><dd>RFP/2025/NH-44-Pkg2</dd>
+        </dl>
+      </div>
+
+      <div class="card">
+        <div class="trace-head"><span class="step-badge">2</span><h3>Logged as Pending</h3><span class="pill pill-status" style="margin-left:auto">PostgreSQL</span></div>
+        <dl class="kv">
+          <dt>query_id</dt><dd>Q-2091</dd>
+          <dt>status</dt><dd>pending</dd>
+          <dt>vectorized</dt><dd>false</dd>
+          <dt>submitted_at</dt><dd>2026&#8209;09&#8209;14 11:02 IST</dd>
+        </dl>
+      </div>
+
+      <div class="card">
+        <div class="trace-head"><span class="step-badge">3</span><h3>Auto-Vectorized &amp; Matched</h3><span class="pill pill-status" style="margin-left:auto">Scheduler + Chief Engineer Agent</span></div>
+        <dl class="kv">
+          <dt>embedding_model</dt><dd>nomic&#8209;embed&#8209;text</dd>
+          <dt>compared_against</dt><dd>1,240 historical queries in ChromaDB</dd>
+        </dl>
+
+        <p style="margin:18px 0 8px; font-size:.94rem; color:var(--ink-soft)">The agent computes the new query's embedding and ranks every historical query in the archive by cosine similarity. The three closest matches:</p>
+
+        <div class="diagram-scroll" style="margin-top:6px">
+          <svg viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="Three historical queries ranked by similarity to the new query. Match A, about clubbing JV turnover, scores 0.87 and falls in the paraphrase band. Match B, about lead-member turnover alone, scores 0.58 and falls in the context-informed band. Match C, about joint bank guarantees, scores 0.21 and is excluded from grounding.">
+            <g font-family="Archivo, sans-serif">
+              <!-- reference ticks shared with the confidence scale -->
+              <g stroke="var(--border)" stroke-dasharray="2 3">
+                <line x1="740" y1="15" x2="740" y2="270"></line>
+                <line x1="900" y1="15" x2="900" y2="270"></line>
+                <line x1="980" y1="15" x2="980" y2="270"></line>
+                <line x1="1100" y1="15" x2="1100" y2="270"></line>
+              </g>
+              <g class="mono" font-size="9.5" fill="var(--ink-soft)">
+                <text x="740" y="12" text-anchor="middle">0.50</text>
+                <text x="900" y="12" text-anchor="middle">0.70</text>
+                <text x="980" y="12" text-anchor="middle">0.80</text>
+                <text x="1100" y="12" text-anchor="middle">0.95</text>
+              </g>
+
+              <!-- Row 1: Match A, score 0.87, paraphrase band -->
+              <text x="20" y="38" font-size="12" font-weight="700" fill="var(--ink)">&ldquo;Can JV members club AAT to meet eligibility?&rdquo;</text>
+              <text x="20" y="55" class="mono" font-size="9.5" fill="var(--ink-soft)">RFP/2024/NH&#8209;56&#8209;Pkg3 &middot; matched historical query</text>
+              <rect x="340" y="20" width="800" height="28" rx="4" fill="var(--panel)" stroke="var(--border)"></rect>
+              <rect x="340" y="20" width="696" height="28" rx="4" fill="var(--accent-400)"></rect>
+              <text x="1148" y="39" class="mono" font-size="12" font-weight="700" fill="var(--accent-600)">0.87 &middot; Paraphrase</text>
+
+              <!-- Row 2: Match B, score 0.58, context-informed -->
+              <text x="20" y="128" font-size="12" font-weight="700" fill="var(--ink)">&ldquo;Can lead member's turnover alone satisfy AAT?&rdquo;</text>
+              <text x="20" y="145" class="mono" font-size="9.5" fill="var(--ink-soft)">RFP/2023/NH&#8209;19&#8209;Pkg7</text>
+              <rect x="340" y="110" width="800" height="28" rx="4" fill="var(--panel)" stroke="var(--border)"></rect>
+              <rect x="340" y="110" width="464" height="28" rx="4" fill="var(--accent-050)" stroke="var(--accent-200)"></rect>
+              <text x="1148" y="129" class="mono" font-size="12" font-weight="700" fill="var(--ink-soft)">0.58 &middot; Context&#8209;informed</text>
+
+              <!-- Row 3: Match C, score 0.21, excluded -->
+              <text x="20" y="218" font-size="12" font-weight="700" fill="var(--ink)">&ldquo;Is bank guarantee required jointly from JV members?&rdquo;</text>
+              <text x="20" y="235" class="mono" font-size="9.5" fill="var(--ink-soft)">RFP/2024/NH&#8209;71&#8209;Pkg1</text>
+              <rect x="340" y="200" width="800" height="28" rx="4" fill="var(--panel)" stroke="var(--border)"></rect>
+              <rect x="340" y="200" width="168" height="28" rx="4" fill="var(--excluded-bg)" stroke="var(--excluded)"></rect>
+              <text x="1148" y="219" class="mono" font-size="12" font-weight="700" fill="var(--excluded)">0.21 &middot; Excluded</text>
+
+              <text x="20" y="270" font-size="11" font-style="italic" fill="var(--ink-soft)">Match A is the closest precedent by topic (turnover clubbing) &mdash; not just by keyword overlap &mdash; so it drives the draft in step 4.</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--accent-600); border-width:1.5px">
+        <div class="trace-head"><span class="step-badge">4</span><h3>AI Drafts a Response</h3><span class="pill pill-status" style="margin-left:auto">Chief Engineer Agent</span></div>
+        <dl class="kv" style="margin-bottom:12px">
+          <dt>confidence</dt><dd>0.87 (Paraphrase tier)</dd>
+          <dt>source</dt><dd>Q&#8209;matched&#8209;4417, RFP/2024/NH&#8209;56&#8209;Pkg3</dd>
+        </dl>
+        <p class="quote">&ldquo;Yes. As per Clause 2.2.2 read with Clause 2.2.5 of the RFP, the Average Annual Turnover of all Joint Venture members shall be combined in proportion to their respective equity share, provided the Lead Member independently meets at least 51% of the stipulated criteria.&rdquo;</p>
+        <p style="margin:0; font-size:.88rem; color:var(--ink-soft)">Reworded from Match A's historical answer to fit the new question's wording &mdash; the defining behaviour of the Paraphrase tier.</p>
+      </div>
+
+      <div class="card">
+        <div class="trace-head"><span class="step-badge">5</span><h3>Officer Reviews &amp; Approves</h3><span class="pill pill-status" style="margin-left:auto">Admin Dashboard</span></div>
+        <dl class="kv">
+          <dt>reviewer</dt><dd>Chief Engineer, Project Circle</dd>
+          <dt>decision</dt><dd>accepted as drafted</dd>
+          <dt>status</dt><dd>under_review &rarr; answered</dd>
+        </dl>
+      </div>
+
+      <div class="card" style="border-color:var(--success)">
+        <div class="trace-head"><span class="step-badge" style="background:var(--success)">6</span><h3>Vendor Receives Answer</h3><span class="pill pill-built" style="margin-left:auto">answered</span></div>
+        <dl class="kv">
+          <dt>published_at</dt><dd>2026&#8209;09&#8209;14 14:30 IST</dd>
+          <dt>visible_in</dt><dd>Vendor Portal &middot; Query History</dd>
+        </dl>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 07 GOVERNANCE -->
+  <section id="governance">
+    <div class="section-head"><span class="eyebrow">07</span><h2>Human-in-the-Loop Governance</h2></div>
+    <p class="lede">A query's status is a visible, auditable trail from submission to publication &mdash; nothing skips the review gate.</p>
+
+    <div class="flow-strip">
+      <span class="pill pill-status">pending</span>
+      <span class="arrow">&rarr;</span>
+      <span class="pill pill-status">under_review</span>
+      <span class="arrow">&rarr;</span>
+      <span class="pill pill-built">answered</span>
+      <span class="arrow" style="margin-left:8px">&nbsp;or&nbsp;&rarr;</span>
+      <span class="pill pill-progress">clarification_needed</span>
+    </div>
+
+    <div class="callout" style="margin-top:20px">
+      <div class="icon">&#9679;</div>
+      <div>
+        <h3>Reuse a prior decision, not just the AI draft</h3>
+        <p>The review screen shows the matched historical query, its confidence score, and its source document alongside the AI's draft. The reviewing officer can accept the draft as-is, edit it, or discard it in favour of a <em>different</em> historical precedent they judge more appropriate &mdash; the AI narrows the search, the officer makes the call.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 PATTERNS -->
+  <section id="patterns">
+    <div class="section-head"><span class="eyebrow">08</span><h2>Design Patterns Applied</h2></div>
+    <p class="lede">Rather than a general-purpose autonomous multi-agent framework (LangGraph, CrewAI, AutoGen), this system uses a small number of purpose-built Python services orchestrated by direct, auditable code &mdash; each step is inspectable and logged. For a tender-compliance workflow, explainability took priority over agent autonomy.</p>
+    <div class="grid grid-2">
+      <div class="card"><h3>Retrieval-Augmented Generation</h3><p>The LLM never answers from memory. It is only allowed to write a reply after retrieving grounding evidence from the vector store.</p></div>
+      <div class="card"><h3>Confidence-Tiered Generation</h3><p>The retrieval score directly controls how much the model may author versus reuse verbatim &mdash; a graduated hand-off from precedent to synthesis to human judgement.</p></div>
+      <div class="card"><h3>Human-in-the-Loop Review Gate</h3><p>Every AI output lands in <code>under_review</code> before it can reach a vendor; nothing auto-publishes.</p></div>
+      <div class="card"><h3>Scheduler / Background Worker</h3><p>Query submission and AI processing are decoupled by a polling scheduler, so vendor-facing screens stay fast regardless of AI load.</p></div>
+      <div class="card"><h3>Service-per-Capability</h3><p>Retrieval, drafting, and document ingestion are three independent Python services &mdash; each can be scaled, upgraded, or swapped (e.g. a different local or hosted LLM) on its own.</p></div>
+      <div class="card"><h3>Shared Toolkit, Independent Agents</h3><p>Both agents build on one common LangChain-based toolkit (embeddings, prompt templates, chunking) rather than calling each other directly &mdash; low coupling, consistent behaviour.</p></div>
+    </div>
+  </section>
+
+  <!-- 08 STACK -->
+  <section id="stack">
+    <div class="section-head"><span class="eyebrow">09</span><h2>Technology Stack</h2></div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Layer</th><th>Technology</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td>Frontend</td><td class="mono">Next.js / React</td><td>Vendor portal &amp; admin dashboard</td></tr>
+          <tr><td>Backend API</td><td class="mono">NestJS + TypeORM</td><td>Business rules, auth, workflow state</td></tr>
+          <tr><td>Primary database</td><td class="mono">PostgreSQL</td><td>Vendors, queries, workflow &amp; audit trail</td></tr>
+          <tr><td>Async processing</td><td class="mono">Bull + Redis / NestJS Cron</td><td>Document ingestion queue &amp; query vectorization scheduler</td></tr>
+          <tr><td>AI services</td><td class="mono">Python + FastAPI + LangChain</td><td>History Retriever Agent, Chief Engineer Agent, ingestion service</td></tr>
+          <tr><td>Language model</td><td class="mono">Ollama &mdash; phi, gemma3:1b</td><td>Runs locally; drafts replies, classifies queries</td></tr>
+          <tr><td>Embeddings</td><td class="mono">nomic-embed-text (Ollama)</td><td>Turns text into vectors for similarity search</td></tr>
+          <tr><td>Vector store</td><td class="mono">ChromaDB</td><td>Query archive, RFP/corrigendum/Q&amp;A collections</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 09 STATUS -->
+  <section id="status">
+    <div class="section-head"><span class="eyebrow">10</span><h2>Implementation Status</h2></div>
+    <p class="lede">An honest snapshot of what's built and demonstrable today in the PoC versus what's scoped for the next phase.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Capability</th><th>Status</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>Vendor query submission &amp; dashboard</td><td><span class="pill pill-built">built</span></td><td>Live end to end</td></tr>
+          <tr><td>Pre-bid query matching &amp; AI draft</td><td><span class="pill pill-built">built</span></td><td>Matched-query archive only (step 3 of the agent pipeline)</td></tr>
+          <tr><td>Admin review &amp; decision workflow</td><td><span class="pill pill-built">built</span></td><td>Accept / edit / override, with source &amp; confidence shown</td></tr>
+          <tr><td>Historical data ingestion (RFPs, corrigenda, Q&amp;A)</td><td><span class="pill pill-built">built</span></td><td>Upload, chunk, embed pipeline live</td></tr>
+          <tr><td>Historical RFP document grounding (agent step 2)</td><td><span class="pill pill-progress">in progress</span></td><td>Coded, pending phase-2 activation</td></tr>
+          <tr><td>Automated answer-quality scoring (RAGAS: faithfulness &amp; relevancy)</td><td><span class="pill pill-progress">in progress</span></td><td>Live on document search; not yet connected to the vendor-query path</td></tr>
+          <tr><td>Analytics dashboard</td><td><span class="pill pill-progress">in progress</span></td><td>Partial</td></tr>
+          <tr><td>Conformance checker vs. Standard Bidding Documents</td><td><span class="pill pill-planned">planned</span></td><td>Next phase</td></tr>
+          <tr><td>Corrigendum generator</td><td><span class="pill pill-planned">planned</span></td><td>Next phase</td></tr>
+          <tr><td>Unified document viewer</td><td><span class="pill pill-planned">planned</span></td><td>Next phase</td></tr>
+          <tr><td>Real-time assistant chatbot</td><td><span class="pill pill-planned">planned</span></td><td>Next phase</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>This document describes the architecture of the NHAI Tender Automation proof of concept as implemented. It is intended to brief NHAI's technical and business reviewers ahead of a deeper design or scale-up discussion.</p>
+    <dl class="doc-control">
+      <dt>Doc ref</dt><dd>NHAI&#8209;POC&#8209;ARCH&#8209;01</dd>
+      <dt>Version</dt><dd>1.0 &middot; 16 Sep 2026</dd>
+    </dl>
+  </footer>
+
+</div>

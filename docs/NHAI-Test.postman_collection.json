@@ -1,0 +1,107 @@
+{
+  "info": {
+    "name": "NHAI Tender Automation Test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "f5f1b6e0-1f4a-4b89-9a3c-collection"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "document_id", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Upload Historical Document",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/historical-data/upload",
+          "host": ["{{baseUrl}}"],
+          "path": ["historical-data","upload"]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "file", "type": "file", "src": "C:/Path/To/document.pdf" },
+            { "key": "rfp_number", "value": "RFP-2024-NH-001" },
+            { "key": "title", "value": "Mumbai-Pune Expressway Development" },
+            { "key": "document_type", "value": "RFP" },
+            { "key": "description", "value": "Historical RFP for reference" }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "let json = {};",
+              "try { json = pm.response.json(); } catch(e){}",
+              "if (json && json.document_id) {",
+              "  pm.environment.set('document_id', json.document_id);",
+              "  pm.test('Captured document_id', function(){ pm.expect(json.document_id).to.be.a('number'); });",
+              "} else {",
+              "  pm.test('Upload response has document_id', function(){ pm.expect(false, 'document_id missing').to.be.true; });",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Get Document Status",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "url": {
+          "raw": "{{baseUrl}}/historical-data/{{document_id}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["historical-data","{{document_id}}"]
+        }
+      }
+    },
+    {
+      "name": "List Documents",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "url": {
+          "raw": "{{baseUrl}}/historical-data?type=RFP&status=COMPLETED&rfp_number=RFP-2024-NH-001",
+          "host": ["{{baseUrl}}"],
+          "path": ["historical-data"],
+          "query": [
+            { "key": "type", "value": "RFP" },
+            { "key": "status", "value": "COMPLETED" },
+            { "key": "rfp_number", "value": "RFP-2024-NH-001" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Stats Summary",
+      "request": {
+        "method": "GET",
+        "header": [ { "key": "Accept", "value": "application/json" } ],
+        "url": {
+          "raw": "{{baseUrl}}/historical-data/stats/summary",
+          "host": ["{{baseUrl}}"],
+          "path": ["historical-data","stats","summary"]
+        }
+      }
+    },
+    {
+      "name": "Swagger UI",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/docs",
+          "host": ["http://localhost:3000"],
+          "path": ["api","docs"]
+        }
+      }
+    }
+  ]
+}

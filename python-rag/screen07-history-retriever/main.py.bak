@@ -1,0 +1,27 @@
+# Backup of main.py before async queue/status logic implementation
+# Date: 2026-01-31
+# Path: python-rag/screen07-history-retriever/main.py
+
+# This is a backup of the original FastAPI service before introducing async queue/status logic for document processing and search.
+
+# --- BEGIN ORIGINAL FILE ---
+
+"""
+NHAI RAG System - Screen 7: History Retriever Agent
+Main FastAPI Server
+
+This service provides:
+- Document ingestion and vectorization
+- Semantic search across historical data
+- RAG configuration management
+- Transaction tracking
+- Integration with NestJS backend
+
+Port: 8000
+Author: NHAI Development Team
+Date: January 2026
+"""
+
+# ...existing code...
+
+# --- END ORIGINAL FILE ---

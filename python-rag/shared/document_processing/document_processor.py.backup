@@ -1,0 +1,345 @@
+"""
+NHAI Tender Query Automation System
+Document Processor with Ollama/OpenAI Support
+
+Purpose:
+- Extract text from PDF, DOCX, CSV, XLSX documents
+- Generate embeddings using Ollama (primary) or OpenAI (fallback)
+- Chunk large documents for vector storage
+- Process RFP, Q&A, and Corrigendum documents
+
+File: python-rag/shared/document_processing/document_processor.py
+Author: NHAI Development Team
+Date: January 2026
+"""
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.document_loaders import PyPDFLoader
+from docx import Document
+import pandas as pd
+from typing import List, Dict, Optional
+import os
+import logging
+import numpy as np
+
+# Ollama support
+try:
+    import ollama
+    OLLAMA_AVAILABLE = True
+except ImportError:
+    OLLAMA_AVAILABLE = False
+    logging.warning("Ollama not available. Install with: pip install ollama")
+
+logger = logging.getLogger(__name__)
+
+
+class DocumentProcessor:
+    """
+    Process documents with Ollama (primary) or OpenAI (fallback) embeddings
+    Supports: PDF, DOCX, CSV, XLSX
+    """
+
+    def __init__(
+        self,
+        embedding_model: str = "ollama",
+        openai_api_key: Optional[str] = None,
+        ollama_base_url: str = "http://localhost:11434",
+        ollama_model: str = "nomic-embed-text",
+        chunk_size: int = 1000,
+        chunk_overlap: int = 200
+    ):
+        """
+        Initialize document processor with Ollama (primary) or OpenAI (fallback)
+
+        Args:
+            embedding_model: "ollama" or "openai"
+            openai_api_key: OpenAI API key (fallback)
+            ollama_base_url: Ollama server URL
+            ollama_model: Ollama embedding model
+            chunk_size: Size of text chunks
+            chunk_overlap: Overlap between chunks
+        """
+        self.embedding_model_type = embedding_model
+        self.ollama_base_url = ollama_base_url
+        self.ollama_model = ollama_model
+        self.use_ollama = False
+
+        # Try Ollama first
+        if embedding_model == "ollama" and OLLAMA_AVAILABLE:
+            try:
+                self.ollama_client = ollama.Client(host=ollama_base_url)
+                # Test connection
+                test_response = self.ollama_client.embeddings(
+                    model=ollama_model,
+                    prompt="test"
+                )
+                logger.info(f"✓ Using Ollama embeddings: {ollama_model}")
+                self.use_ollama = True
+            except Exception as e:
+                logger.warning(f"Ollama not available: {str(e)}")
+                logger.info("Falling back to OpenAI...")
+                self.use_ollama = False
+
+        # Fallback to OpenAI
+        if not self.use_ollama:
+            if not openai_api_key:
+                openai_api_key = os.getenv("OPENAI_API_KEY")
+            if not openai_api_key:
+                raise ValueError("OpenAI API key required when Ollama is unavailable")
+            self.embeddings = OpenAIEmbeddings(openai_api_key=openai_api_key)
+            logger.info("Using OpenAI embeddings (fallback)")
+
+        # Text splitter
+        self.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            length_function=len,
+            separators=["\n\n", "\n", ".", "!", "?", ",", " ", ""]
+        )
+
+    def _generate_embedding(self, text: str) -> List[float]:
+        """Generate embedding using active provider"""
+        if self.use_ollama:
+            try:
+                response = self.ollama_client.embeddings(
+                    model=self.ollama_model,
+                    prompt=text
+                )
+                return response['embedding']
+            except Exception as e:
+                logger.error(f"Ollama embedding failed: {str(e)}")
+                # Fallback to OpenAI if available
+                if hasattr(self, 'embeddings'):
+                    logger.info("Falling back to OpenAI for this request")
+                    return self.embeddings.embed_query(text)
+                raise
+        else:
+            return self.embeddings.embed_query(text)
+
+    def get_active_provider(self) -> str:
+        """Get name of currently active embedding provider"""
+        if self.use_ollama:
+            return f"ollama ({self.ollama_model})"
+        return "openai"
+
+    async def process_rfp_document(
+        self,
+        file_path: str,
+        document_id: int,
+        rfp_number: str,
+        title: str
+    ) -> Dict:
+        """
+        Process RFP document (PDF or DOCX)
+
+        Returns:
+            Dict containing extracted_content, chunk_embeddings, metadata
+        """
+        logger.info(f"Processing RFP document: {file_path}")
+
+        # 1. Load document
+        if file_path.endswith('.pdf'):
+            loader = PyPDFLoader(file_path)
+            documents = loader.load()
+            full_text = "\n\n".join([doc.page_content for doc in documents])
+        elif file_path.endswith('.docx'):
+            doc = Document(file_path)
+            full_text = "\n\n".join([para.text for para in doc.paragraphs if para.text.strip()])
+        else:
+            raise ValueError(f"Unsupported file type: {file_path}")
+
+        logger.info(f"Extracted {len(full_text)} characters")
+
+        # 2. Split into chunks
+        text_chunks = self.text_splitter.split_text(full_text)
+        logger.info(f"Split into {len(text_chunks)} chunks")
+
+        # 3. Generate embeddings for each chunk
+        chunk_embeddings = []
+        for i, chunk in enumerate(text_chunks):
+            try:
+                embedding = self._generate_embedding(chunk)
+                chunk_embeddings.append({
+                    'text': chunk,
+                    'embedding': embedding,
+                    'chunk_index': i
+                })
+            except Exception as e:
+                logger.error(f"Error embedding chunk {i}: {str(e)}")
+                continue
+
+        logger.info(f"Generated embeddings for {len(chunk_embeddings)} chunks")
+
+        return {
+            'extracted_content': full_text,
+            'chunk_embeddings': chunk_embeddings,
+            'metadata': {
+                'document_id': document_id,
+                'rfp_number': rfp_number,
+                'title': title,
+                'num_chunks': len(text_chunks),
+                'content_length': len(full_text),
+                'embedding_provider': self.get_active_provider()
+            }
+        }
+
+    async def process_qa_csv(
+        self,
+        file_path: str,
+        document_id: int,
+        rfp_number: str
+    ) -> List[Dict]:
+        """
+        Process Q&A CSV file
+
+        Expected columns: Query_ID, Category, Query, Response, Date
+        """
+        logger.info(f"Processing Q&A CSV: {file_path}")
+
+        df = pd.read_csv(file_path)
+        logger.info(f"Loaded {len(df)} Q&A pairs")
+
+        qa_pairs = []
+
+        for idx, row in df.iterrows():
+            try:
+                query = str(row.get('Query', '')).strip()
+                response = str(row.get('Response', '')).strip()
+
+                if not query or not response:
+                    continue
+
+                # Generate embeddings
+                query_embedding = self._generate_embedding(query)
+                response_embedding = self._generate_embedding(response)
+
+                # Combined embedding (weighted)
+                combined_embedding = (
+                    0.7 * np.array(query_embedding) +
+                    0.3 * np.array(response_embedding)
+                ).tolist()
+
+                qa_pairs.append({
+                    'query_id': str(row.get('Query_ID', f'Q{idx:03d}')),
+                    'query': query,
+                    'response': response,
+                    'category': str(row.get('Category', 'General')),
+                    'combined_embedding': combined_embedding,
+                    'metadata': {
+                        'document_id': document_id,
+                        'rfp_number': rfp_number,
+                        'category': str(row.get('Category', 'General'))
+                    }
+                })
+
+            except Exception as e:
+                logger.error(f"Error processing Q&A row {idx}: {str(e)}")
+                continue
+
+        logger.info(f"Processed {len(qa_pairs)} Q&A pairs")
+        return qa_pairs
+
+    async def process_corrigendum(
+        self,
+        file_path: str,
+        document_id: int,
+        rfp_number: str,
+        title: str
+    ) -> Dict:
+        """Process corrigendum document (same as RFP)"""
+        result = await self.process_rfp_document(
+            file_path, document_id, rfp_number, title
+        )
+        result['metadata']['document_type'] = 'CORRIGENDUM'
+        return result
+
+    def generate_embedding(self, text: str) -> List[float]:
+        """Generate embedding for given text"""
+        return self._generate_embedding(text)
+
+    def calculate_similarity(
+        self,
+        embedding1: List[float],
+        embedding2: List[float]
+    ) -> float:
+        """Calculate cosine similarity between embeddings"""
+        vec1 = np.array(embedding1)
+        vec2 = np.array(embedding2)
+
+        dot_product = np.dot(vec1, vec2)
+        norm1 = np.linalg.norm(vec1)
+        norm2 = np.linalg.norm(vec2)
+
+        if norm1 == 0 or norm2 == 0:
+            return 0.0
+
+        similarity = dot_product / (norm1 * norm2)
+        return max(0.0, min(1.0, similarity))    
+    async def generate_embeddings(self, text: str) -> List[float]:
+        """
+        Generate embeddings for a given text (async wrapper)
+        Used for query processing
+        """
+        return self._generate_embedding(text)
+    
+    async def generate_answer(self, question: str, context: str) -> str:
+        """
+        Generate answer using LLM based on question and context
+        
+        Args:
+            question: User's question
+            context: Retrieved context from vector database
+            
+        Returns:
+            str: Generated answer
+        """
+        try:
+            # Build prompt
+            prompt = f"""Based on the following context from the document, please answer the question.
+
+Context:
+{context}
+
+Question: {question}
+
+Answer the question based only on the information provided in the context above. If the context doesn't contain enough information to answer the question, say so.
+
+Answer:"""
+            
+            if self.use_ollama:
+                # Use Ollama for generation
+                llm_model = os.getenv("OLLAMA_LLM_MODEL", "gemma3:1b")
+                response = self.ollama_client.generate(
+                    model=llm_model,
+                    prompt=prompt,
+                    options={
+                        "temperature": 0.7,
+                        "top_p": 0.9,
+                        "num_predict": 500
+                    },
+                    stream=False
+                )
+                answer = response['response'].strip()
+            else:
+                # Use OpenAI for generation
+                from openai import OpenAI
+                openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+                
+                response = openai_client.chat.completions.create(
+                    model=os.getenv("OPENAI_MODEL", "gpt-3.5-turbo"),
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant that answers questions based on provided context."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.7,
+                    max_tokens=500
+                )
+                answer = response.choices[0].message.content.strip()
+            
+            logger.info(f"Generated answer using {'Ollama' if self.use_ollama else 'OpenAI'}")
+            return answer
+            
+        except Exception as e:
+            logger.error(f"Error generating answer: {str(e)}")
+            return f"I encountered an error while generating the answer: {str(e)}"

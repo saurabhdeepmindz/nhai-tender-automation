@@ -1,0 +1,17 @@
+# Backend
+NODE_ENV=development
+PORT=3001
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+DB_DATABASE=nhai_tender_db
+JWT_SECRET=your_jwt_secret_key
+
+# Frontend
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+
+# RAG Services
+OLLAMA_BASE_URL=http://localhost:11434
+DEFAULT_MODEL=gemma:latest
+DEFAULT_EMBEDDING=nomic-embed-text

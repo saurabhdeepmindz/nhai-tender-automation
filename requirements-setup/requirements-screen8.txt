@@ -1,0 +1,112 @@
+# ============================================================================
+# NHAI Tender Query Automation System
+# Screen 8: Chief Engineer Agent - Requirements
+# ============================================================================
+#
+# This file contains dependencies specific to Screen 8 (Query Processing Agent)
+# Use this if deploying Screen 8 separately from Screen 7
+#
+# Installation: pip install -r requirements-screen8.txt --break-system-packages
+# Python Version: 3.10 or higher
+# ============================================================================
+
+# ============================================================================
+# CORE WEB FRAMEWORK
+# ============================================================================
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-multipart==0.0.6
+
+# ============================================================================
+# LANGCHAIN ECOSYSTEM
+# ============================================================================
+langchain==0.1.6
+langchain-core==0.1.16
+langchain-community==0.0.16
+langchain-openai==0.0.5
+langgraph==0.0.20
+langsmith==0.0.83                   # For workflow tracing
+
+# ============================================================================
+# LLM PROVIDERS
+# ============================================================================
+openai==1.10.0
+ollama==0.1.6
+
+# ============================================================================
+# VECTOR DATABASE
+# ============================================================================
+chromadb==0.4.22
+sentence-transformers==2.3.1
+
+# ============================================================================
+# DOCUMENT PROCESSING (BASIC)
+# ============================================================================
+PyPDF2==3.0.1
+python-docx==1.1.0
+pandas==2.2.0
+
+# ============================================================================
+# TEXT PROCESSING & NLP
+# ============================================================================
+tiktoken==0.5.2
+nltk==3.8.1
+spacy==3.7.2
+
+# ============================================================================
+# EMBEDDINGS
+# ============================================================================
+nomic==1.1.4
+transformers==4.37.2
+torch==2.1.2
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+python-dotenv==1.0.0
+requests==2.31.0
+httpx==0.26.0
+aiofiles==23.2.1
+loguru==0.7.2
+colorama==0.4.6
+
+# ============================================================================
+# DATA SCIENCE
+# ============================================================================
+numpy==1.26.3
+scipy==1.12.0
+
+# ============================================================================
+# VALIDATION
+# ============================================================================
+jsonschema==4.20.0
+pyyaml==6.0.1
+
+# ============================================================================
+# ASYNC & HTTP
+# ============================================================================
+aiohttp==3.9.1
+
+# ============================================================================
+# SCREEN 8 SPECIFIC NOTES
+# ============================================================================
+# Screen 8 handles:
+# - Query analysis and classification
+# - Historical data search (calls Screen 7)
+# - Similar query search (ChromaDB)
+# - AI response generation (LLM)
+# - Response validation and enhancement
+# - Confidence score calculation
+# - 6-step workflow orchestration
+#
+# Key dependencies:
+# - LangGraph for 6-step agent workflow
+# - LangChain for LLM interaction
+# - ChromaDB for similar query search
+# - httpx/aiohttp for calling Screen 7 API
+# - NLP libs (spacy, nltk) for query analysis
+#
+# Note: Screen 8 requires Screen 7 to be running for historical data search
+# ============================================================================

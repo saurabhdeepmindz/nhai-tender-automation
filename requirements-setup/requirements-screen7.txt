@@ -1,0 +1,102 @@
+# ============================================================================
+# NHAI Tender Query Automation System
+# Screen 7: History Retriever Agent - Requirements
+# ============================================================================
+#
+# This file contains dependencies specific to Screen 7 (Historical Data RAG)
+# Use this if deploying Screen 7 separately from Screen 8
+#
+# Installation: pip install -r requirements-screen7.txt --break-system-packages
+# Python Version: 3.10 or higher
+# ============================================================================
+
+# ============================================================================
+# CORE WEB FRAMEWORK
+# ============================================================================
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-multipart==0.0.6
+
+# ============================================================================
+# LANGCHAIN ECOSYSTEM
+# ============================================================================
+langchain==0.1.6
+langchain-core==0.1.16
+langchain-community==0.0.16
+langchain-openai==0.0.5
+langgraph==0.0.20
+
+# ============================================================================
+# LLM PROVIDERS
+# ============================================================================
+openai==1.10.0
+ollama==0.1.6
+
+# ============================================================================
+# VECTOR DATABASE
+# ============================================================================
+chromadb==0.4.22
+sentence-transformers==2.3.1
+
+# ============================================================================
+# DOCUMENT PROCESSING (IMPORTANT FOR SCREEN 7)
+# ============================================================================
+PyPDF2==3.0.1                       # PDF processing (RFPs)
+python-docx==1.1.0                  # Word documents
+openpyxl==3.1.2                     # Excel files (Q&A data)
+pandas==2.2.0                       # CSV processing
+python-pptx==0.6.23                 # PowerPoint files
+
+# ============================================================================
+# TEXT PROCESSING
+# ============================================================================
+tiktoken==0.5.2
+nltk==3.8.1
+
+# ============================================================================
+# EMBEDDINGS
+# ============================================================================
+nomic==1.1.4
+transformers==4.37.2
+torch==2.1.2
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+python-dotenv==1.0.0
+requests==2.31.0
+httpx==0.26.0
+aiofiles==23.2.1
+loguru==0.7.2
+colorama==0.4.6
+
+# ============================================================================
+# DATA SCIENCE
+# ============================================================================
+numpy==1.26.3
+scipy==1.12.0
+
+# ============================================================================
+# VALIDATION
+# ============================================================================
+jsonschema==4.20.0
+pyyaml==6.0.1
+
+# ============================================================================
+# SCREEN 7 SPECIFIC NOTES
+# ============================================================================
+# Screen 7 handles:
+# - Document ingestion (PDF, DOCX, XLSX, CSV)
+# - Text chunking and embedding generation
+# - Vector storage in ChromaDB
+# - Semantic search over historical data
+# - 5-step retrieval workflow
+#
+# Key dependencies:
+# - Document processing libs (PyPDF2, python-docx, openpyxl, pandas)
+# - ChromaDB for vector storage
+# - LangChain for RAG pipeline
+# - LangGraph for 5-step workflow
+# ============================================================================

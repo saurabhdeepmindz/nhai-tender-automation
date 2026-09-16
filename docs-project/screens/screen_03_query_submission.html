@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - Submit Query</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 5px solid #ff6b35;
+        }
+
+        .page-header h2 {
+            color: #1e3c72;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            color: #1e3c72;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .required {
+            color: #ff6b35;
+            margin-left: 3px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .speech-input-container {
+            position: relative;
+        }
+
+        .speech-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .speech-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speech-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+
+        .speech-btn:active {
+            transform: translateY(0);
+        }
+
+        .speech-btn.recording {
+            background: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .speech-status {
+            padding: 10px 15px;
+            background: #e8f0ff;
+            border-radius: 6px;
+            color: #2a5298;
+            font-size: 13px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .speech-status.active {
+            display: flex;
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .file-upload {
+            border: 2px dashed #e0e0e0;
+            border-radius: 6px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #2a5298;
+            background: #f8f9fa;
+        }
+
+        .file-upload input[type="file"] {
+            display: none;
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .file-upload-hint {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .uploaded-files {
+            margin-top: 15px;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            padding: 12px 15px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .file-name {
+            color: #333;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .remove-file {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .remove-file:hover {
+            background: #c82333;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .btn-secondary:hover {
+            background: #d0e0ff;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #666;
+            border: 2px solid #e0e0e0;
+        }
+
+        .btn-outline:hover {
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        .info-box {
+            background: #e8f0ff;
+            border-left: 4px solid #2a5298;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+        }
+
+        .info-box-icon {
+            font-size: 24px;
+        }
+
+        .info-box-content {
+            flex: 1;
+        }
+
+        .info-box-title {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .info-box-text {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .form-container {
+                padding: 25px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_02_vendor_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">ABC Construction Ltd.</div>
+                <div class="user-role">Vendor/Bidder</div>
+            </div>
+            <div class="user-avatar">AC</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>📝 Submit Prebid Query</h2>
+            <p>Fill in the details below to submit your query. AI will assist in providing quick responses.</p>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-box-icon">💡</div>
+            <div class="info-box-content">
+                <div class="info-box-title">Query Submission Tips</div>
+                <div class="info-box-text">
+                    Please provide specific clause references and page numbers for faster response. You can type your query or use speech-to-text for convenience.
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="form-container">
+            <form id="queryForm">
+                <!-- Section 1: RFP Selection -->
+                <div class="form-section">
+                    <div class="section-title">📁 RFP Selection</div>
+                    <div class="form-group full-width">
+                        <label for="rfp">Select RFP/Tender Document <span class="required">*</span></label>
+                        <select id="rfp" required>
+                            <option value="">-- Select RFP --</option>
+                            <option value="rfp1">NH-319 Arrah Bypass (Asni to Baonpali) - EPC Mode</option>
+                            <option value="rfp2">NH-30 Extension Project - Design & Build</option>
+                            <option value="rfp3">NH-48 Four Lane Expansion - HAM Mode</option>
+                        </select>
+                        <div class="input-hint">Select the RFP document for which you want to submit the query</div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Query Reference Details -->
+                <div class="form-section">
+                    <div class="section-title">📌 Query Reference Details</div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="clauseRef">Clause of Reference</label>
+                            <input type="text" id="clauseRef" placeholder="e.g., Schedule B, Clause 11.1">
+                            <div class="input-hint">Specific clause or section reference</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="pageNumber">Page Number</label>
+                            <input type="number" id="pageNumber" placeholder="e.g., 45" min="1">
+                            <div class="input-hint">Page number in the RFP document</div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label for="clauseTitle">Clause Title/Description</label>
+                            <input type="text" id="clauseTitle" placeholder="e.g., RE Wall Construction">
+                            <div class="input-hint">Brief title of the clause being questioned</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Query Category -->
+                <div class="form-section">
+                    <div class="section-title">🏷️ Query Classification</div>
+                    <div class="form-group full-width">
+                        <label for="category">Query Category <span class="required">*</span></label>
+                        <select id="category" required>
+                            <option value="">-- Select Category --</option>
+                            <option value="eligibility">Eligibility</option>
+                            <option value="technical">Technical Specifications</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="contractual">Contractual</option>
+                        </select>
+                        <div class="input-hint">Categorize your query for better processing</div>
+                    </div>
+                </div>
+
+                <!-- Section 4: Query Description -->
+                <div class="form-section">
+                    <div class="section-title">✍️ Query Description</div>
+                    <div class="form-group full-width">
+                        <label for="queryText">Describe Your Query <span class="required">*</span></label>
+                        <textarea id="queryText" placeholder="Please provide detailed description of your query..." required maxlength="2000"></textarea>
+                        <div class="char-counter">
+                            <span id="charCount">0</span> / 2000 characters
+                        </div>
+                    </div>
+
+                    <!-- Speech to Text -->
+                    <div class="speech-input-container">
+                        <div class="speech-controls">
+                            <button type="button" class="speech-btn" id="speechBtn" onclick="toggleSpeech()">
+                                <span>🎤</span>
+                                <span id="speechBtnText">Start Speech Input</span>
+                            </button>
+                            <div class="speech-status" id="speechStatus">
+                                <span>🔴</span>
+                                <span>Listening...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 5: Supporting Documents -->
+                <div class="form-section">
+                    <div class="section-title">📎 Supporting Documents (Optional)</div>
+                    <div class="form-group full-width">
+                        <label class="file-upload" for="fileUpload">
+                            <input type="file" id="fileUpload" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
+                            <div class="file-upload-icon">📄</div>
+                            <div class="file-upload-text">Click to upload or drag and drop</div>
+                            <div class="file-upload-hint">PDF, DOC, DOCX, JPG, PNG (Max 10MB per file)</div>
+                        </label>
+                        
+                        <div class="uploaded-files" id="uploadedFiles" style="display: none;">
+                            <!-- Files will be added here dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="saveDraft()">
+                        <span>💾</span>
+                        <span>Save as Draft</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="previewQuery()">
+                        <span>👁️</span>
+                        <span>Preview Query</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <span>✓</span>
+                        <span>Submit Query</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 3 of 13: Query Submission Form</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_02_vendor_dashboard.html" style="color: #2a5298; text-decoration: none;">Vendor Dashboard</a></span>
+        </div>
+        <div>
+            <a href="screen_04_chatbot.html" class="nav-button">Next: Interactive Chatbot →</a>
+        </div>
+    </div>
+
+    <script>
+        // Character counter
+        document.getElementById('queryText').addEventListener('input', function() {
+            const count = this.value.length;
+            document.getElementById('charCount').textContent = count;
+        });
+
+        // Speech to text simulation
+        let isRecording = false;
+        function toggleSpeech() {
+            const btn = document.getElementById('speechBtn');
+            const status = document.getElementById('speechStatus');
+            const btnText = document.getElementById('speechBtnText');
+
+            isRecording = !isRecording;
+
+            if (isRecording) {
+                btn.classList.add('recording');
+                status.classList.add('active');
+                btnText.textContent = 'Stop Recording';
+                
+                // Simulate speech recognition
+                setTimeout(() => {
+                    const textarea = document.getElementById('queryText');
+                    textarea.value += (textarea.value ? ' ' : '') + 'Kindly take note of Page number 45 of 94, clause 11.1 of Schedule B of CA...';
+                    textarea.dispatchEvent(new Event('input'));
+                }, 2000);
+            } else {
+                btn.classList.remove('recording');
+                status.classList.remove('active');
+                btnText.textContent = 'Start Speech Input';
+            }
+        }
+
+        // File upload handling
+        function handleFileUpload(event) {
+            const files = event.target.files;
+            const container = document.getElementById('uploadedFiles');
+            
+            if (files.length > 0) {
+                container.style.display = 'block';
+                container.innerHTML = '';
+                
+                Array.from(files).forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div class="file-name">
+                            <span>📄</span>
+                            <span>${file.name}</span>
+                            <span style="color: #999; font-size: 12px;">(${(file.size / 1024).toFixed(2)} KB)</span>
+                        </div>
+                        <button type="button" class="remove-file" onclick="removeFile(${index})">Remove</button>
+                    `;
+                    container.appendChild(fileItem);
+                });
+            }
+        }
+
+        function removeFile(index) {
+            // Implementation for removing files
+            console.log('Remove file at index:', index);
+        }
+
+        function saveDraft() {
+            alert('Query saved as draft! You can continue editing later.');
+        }
+
+        function previewQuery() {
+            alert('Preview functionality will show your query before submission.');
+        }
+
+        // Form submission
+        document.getElementById('queryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Query submitted successfully! You will receive a notification once it is answered.');
+            window.location.href = 'screen_05_query_history.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+# ===========================================================================
+# NHAI Screen 8 (Chief Engineer Agent) - Environment Configuration
+# Supports BOTH Ollama (Free) and OpenAI (Paid)
+# ===========================================================================
+
+# -----------------------------------------------------------------------------
+# PROVIDER SELECTION - Change these to switch between Ollama and OpenAI
+# -----------------------------------------------------------------------------
+# Options: "ollama" (free, local) or "openai" (paid, cloud)
+EMBEDDING_PROVIDER=ollama
+LLM_PROVIDER=ollama
+
+# -----------------------------------------------------------------------------
+# OLLAMA CONFIGURATION (Free, Local - Default)
+# -----------------------------------------------------------------------------
+# Ollama must be installed and running: https://ollama.ai
+# Download models:
+#   ollama pull nomic-embed-text  (for embeddings)
+#   ollama pull llama3            (for LLM)
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+OLLAMA_LLM_MODEL=llama3
+
+# Alternative Ollama LLM models:
+# OLLAMA_LLM_MODEL=mistral      (4.1GB - good alternative)
+# OLLAMA_LLM_MODEL=phi3         (2.3GB - lightweight, faster)
+# OLLAMA_LLM_MODEL=llama3:70b   (40GB - best quality, needs 64GB RAM)
+
+# -----------------------------------------------------------------------------
+# OPENAI CONFIGURATION (Paid, Cloud - Optional)
+# -----------------------------------------------------------------------------
+# To use OpenAI:
+# 1. Get API key from: https://platform.openai.com/api-keys
+# 2. Uncomment the line below and add your key
+# 3. Change EMBEDDING_PROVIDER=openai and LLM_PROVIDER=openai above
+# OPENAI_API_KEY=sk-your-openai-api-key-here
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+OPENAI_LLM_MODEL=gpt-4o-mini
+
+# Alternative OpenAI models:
+# OPENAI_LLM_MODEL=gpt-4o           (more expensive, best quality)
+# OPENAI_LLM_MODEL=gpt-3.5-turbo    (cheaper, faster)
+# OPENAI_EMBEDDING_MODEL=text-embedding-3-large  (better embeddings)
+
+# -----------------------------------------------------------------------------
+# SERVER CONFIGURATION
+# -----------------------------------------------------------------------------
+HOST=0.0.0.0
+PORT=8001
+
+# -----------------------------------------------------------------------------
+# HISTORY RETRIEVER (Screen 7) URL
+# -----------------------------------------------------------------------------
+# Screen 8 calls Screen 7 for historical data search
+HISTORY_RETRIEVER_URL=http://localhost:8000
+
+# -----------------------------------------------------------------------------
+# LLM SETTINGS
+# -----------------------------------------------------------------------------
+# Temperature: 0.0 = deterministic, 1.0 = creative
+LLM_TEMPERATURE=0.7
+
+# Maximum tokens in response
+LLM_MAX_TOKENS=2000
+
+# Timeout for LLM requests (seconds)
+LLM_TIMEOUT=60
+
+# -----------------------------------------------------------------------------
+# WORKFLOW CONFIGURATION
+# -----------------------------------------------------------------------------
+# Minimum confidence threshold for AI responses
+MIN_CONFIDENCE=0.7
+
+# Default number of historical documents to retrieve
+DEFAULT_TOP_K=5
+
+# Enable/disable historical data search
+USE_HISTORICAL_DATA=true
+
+# Enable/disable similar query search
+SEARCH_SIMILAR_QUERIES=true
+
+# -----------------------------------------------------------------------------
+# STORAGE
+# -----------------------------------------------------------------------------
+# Directory for query database (ChromaDB)
+QUERY_DB_DIR=./query_db
+
+# -----------------------------------------------------------------------------
+# PERFORMANCE TUNING
+# -----------------------------------------------------------------------------
+# Enable caching for embeddings
+CACHE_ENABLED=true
+CACHE_DIR=./.cache
+
+# -----------------------------------------------------------------------------
+# LOGGING
+# -----------------------------------------------------------------------------
+LOG_LEVEL=INFO
+# Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# Enable detailed workflow logging
+WORKFLOW_LOGGING=true
+
+# -----------------------------------------------------------------------------
+# NOTES:
+# -----------------------------------------------------------------------------
+# CURRENT SETUP: Using Ollama (free)
+# - EMBEDDING_PROVIDER=ollama (for query vectorization)
+# - LLM_PROVIDER=ollama (for AI response generation)
+# - No API costs
+# - 100% private (data stays local)
+# - Requires: Ollama installed + models downloaded
+#
+# TO SWITCH TO OPENAI:
+# 1. Change: EMBEDDING_PROVIDER=openai
+# 2. Change: LLM_PROVIDER=openai
+# 3. Add your: OPENAI_API_KEY=sk-...
+# 4. Restart service
+#
+# HYBRID SETUP (Mix Ollama + OpenAI):
+# - EMBEDDING_PROVIDER=ollama (free embeddings)
+# - LLM_PROVIDER=openai (better responses)
+# - Only pay for LLM calls, embeddings are free
+#
+# OLLAMA SETUP:
+# 1. Install: https://ollama.ai/download
+# 2. Run: ollama pull nomic-embed-text
+# 3. Run: ollama pull llama3
+# 4. Verify: ollama list
+#
+# PERFORMANCE:
+# - Ollama: 2-5 seconds per query (local)
+# - OpenAI: 1-3 seconds per query (cloud, depends on internet)
+#
+# COST (OpenAI):
+# - ~$0.002 per query (~$2 for 1000 queries)
+# - Embeddings: ~$0.00001 per query
+# - LLM: ~$0.002 per query
+# ===========================================================================

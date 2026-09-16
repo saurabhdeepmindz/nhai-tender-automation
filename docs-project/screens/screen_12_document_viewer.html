@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - Document Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .document-list {
+            flex: 1;
+            padding: 15px;
+        }
+
+        .document-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .document-item:hover {
+            background: #e8f0ff;
+            border-left-color: #2a5298;
+        }
+
+        .document-item.active {
+            background: #e8f0ff;
+            border-left-color: #ff6b35;
+            box-shadow: 0 2px 8px rgba(42, 82, 152, 0.2);
+        }
+
+        .doc-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .doc-name {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .doc-meta {
+            font-size: 11px;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .upload-new-btn {
+            margin: 0 15px 15px 15px;
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .upload-new-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+
+        .viewer-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #e8e8e8;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 12px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .toolbar-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 8px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toolbar-btn:hover {
+            background: #e8f0ff;
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        .toolbar-btn.active {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+        }
+
+        .zoom-controls {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 4px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .zoom-btn {
+            background: white;
+            border: none;
+            color: #495057;
+            padding: 6px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .zoom-btn:hover {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .zoom-level {
+            padding: 0 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .page-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 6px 12px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+
+        .page-input {
+            width: 50px;
+            padding: 4px 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .page-total {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .search-box {
+            position: relative;
+            width: 250px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 35px 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .document-display {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .document-page {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            max-width: 900px;
+            width: 100%;
+            min-height: 1100px;
+            padding: 60px;
+            border-radius: 4px;
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #1e3c72;
+        }
+
+        .doc-org {
+            color: #1e3c72;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .doc-title {
+            color: #1e3c72;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .doc-subtitle {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .doc-content {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .doc-content h3 {
+            color: #1e3c72;
+            font-size: 18px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .doc-content p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .doc-content ul {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+
+        .doc-content li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: yellow;
+            padding: 2px 4px;
+        }
+
+        .annotation {
+            position: relative;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .annotation-author {
+            font-size: 11px;
+            color: #856404;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .annotation-text {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .sidebar-right {
+            width: 300px;
+            background: white;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right-sidebar-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .right-sidebar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #1e3c72;
+            border-bottom: 2px solid #2a5298;
+        }
+
+        .tab-content {
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .thumbnail {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .thumbnail:hover {
+            border-color: #2a5298;
+            background: #e8f0ff;
+        }
+
+        .thumbnail.active {
+            border-color: #ff6b35;
+            background: #fff5f0;
+        }
+
+        .thumbnail-number {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .thumbnail-preview {
+            width: 100%;
+            height: 120px;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #ccc;
+        }
+
+        .outline-item {
+            padding: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #555;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+            margin-bottom: 5px;
+        }
+
+        .outline-item:hover {
+            background: #f8f9fa;
+            border-left-color: #2a5298;
+        }
+
+        .outline-item.level-1 {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .outline-item.level-2 {
+            padding-left: 25px;
+        }
+
+        .outline-item.level-3 {
+            padding-left: 40px;
+            font-size: 12px;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar-right {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                z-index: 100;
+                height: 100%;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .toolbar {
+                padding: 10px;
+            }
+
+            .toolbar-left,
+            .toolbar-right {
+                flex-wrap: wrap;
+            }
+
+            .document-display {
+                padding: 15px;
+            }
+
+            .document-page {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_06_admin_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">Rajesh Kumar</div>
+                <div class="user-role">NHAI Administrator</div>
+            </div>
+            <div class="user-avatar">RK</div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar - Document List -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">📁 Documents</div>
+                <div class="sidebar-subtitle">RFP & Related Files</div>
+            </div>
+
+            <div class="document-list">
+                <div class="document-item active">
+                    <div class="doc-icon">📄</div>
+                    <div class="doc-name">NH-319 Arrah Bypass RFP</div>
+                    <div class="doc-meta">
+                        <span>PDF • 8.4 MB</span>
+                        <span>94 pages</span>
+                    </div>
+                </div>
+
+                <div class="document-item">
+                    <div class="doc-icon">📋</div>
+                    <div class="doc-name">Standard Bidding Document</div>
+                    <div class="doc-meta">
+                        <span>PDF • 5.2 MB</span>
+                        <span>68 pages</span>
+                    </div>
+                </div>
+
+                <div class="document-item">
+                    <div class="doc-icon">📝</div>
+                    <div class="doc-name">Corrigendum-I</div>
+                    <div class="doc-meta">
+                        <span>PDF • 0.8 MB</span>
+                        <span>4 pages</span>
+                    </div>
+                </div>
+
+                <div class="document-item">
+                    <div class="doc-icon">📝</div>
+                    <div class="doc-name">Corrigendum-II</div>
+                    <div class="doc-meta">
+                        <span>PDF • 1.2 MB</span>
+                        <span>6 pages</span>
+                    </div>
+                </div>
+
+                <div class="document-item">
+                    <div class="doc-icon">📊</div>
+                    <div class="doc-name">Technical Drawings</div>
+                    <div class="doc-meta">
+                        <span>PDF • 12.5 MB</span>
+                        <span>42 pages</span>
+                    </div>
+                </div>
+
+                <div class="document-item">
+                    <div class="doc-icon">📈</div>
+                    <div class="doc-name">Geotechnical Report</div>
+                    <div class="doc-meta">
+                        <span>PDF • 6.8 MB</span>
+                        <span>28 pages</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="upload-new-btn">
+                <span>📤</span>
+                <span>Upload New Document</span>
+            </button>
+        </div>
+
+        <!-- Center - Document Viewer -->
+        <div class="viewer-container">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <!-- Zoom Controls -->
+                    <div class="zoom-controls">
+                        <button class="zoom-btn" onclick="zoomOut()">−</button>
+                        <span class="zoom-level" id="zoomLevel">100%</span>
+                        <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    </div>
+
+                    <!-- Page Controls -->
+                    <div class="page-controls">
+                        <button class="zoom-btn" onclick="prevPage()">←</button>
+                        <input type="number" class="page-input" value="1" id="pageInput" min="1" max="94">
+                        <span class="page-total">/ 94</span>
+                        <button class="zoom-btn" onclick="nextPage()">→</button>
+                    </div>
+
+                    <!-- View Options -->
+                    <button class="toolbar-btn" onclick="toggleFitWidth()">
+                        <span>⬌</span>
+                        <span>Fit Width</span>
+                    </button>
+
+                    <button class="toolbar-btn" onclick="toggleFitPage()">
+                        <span>⬍</span>
+                        <span>Fit Page</span>
+                    </button>
+                </div>
+
+                <div class="toolbar-right">
+                    <!-- Search -->
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="Search in document...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+
+                    <!-- Tools -->
+                    <button class="toolbar-btn" onclick="toggleAnnotation()">
+                        <span>✏️</span>
+                        <span>Annotate</span>
+                    </button>
+
+                    <button class="toolbar-btn" onclick="highlightText()">
+                        <span>🖍️</span>
+                        <span>Highlight</span>
+                    </button>
+
+                    <button class="toolbar-btn" onclick="downloadDoc()">
+                        <span>📥</span>
+                        <span>Download</span>
+                    </button>
+
+                    <button class="toolbar-btn" onclick="printDoc()">
+                        <span>🖨️</span>
+                        <span>Print</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Document Display Area -->
+            <div class="document-display">
+                <div class="document-page">
+                    <div class="doc-header">
+                        <div class="doc-org">NATIONAL HIGHWAYS AUTHORITY OF INDIA</div>
+                        <div class="doc-title">Request for Proposal (RFP)</div>
+                        <div class="doc-subtitle">
+                            Construction of four lane Arrah bypass (Asni to Baonpali)<br>
+                            from Km 0+000 (Design Chainage) to Km 4+500 (Design Chainage)<br>
+                            of NH-319 (Old NH-30) in the State of Bihar on EPC Mode
+                        </div>
+                    </div>
+
+                    <div class="doc-content">
+                        <h3>1. Introduction</h3>
+                        <p>
+                            The National Highways Authority of India (NHAI) invites bids from eligible contractors for the construction of a four-lane bypass on National Highway 319 in Bihar. This project encompasses the development of approximately 4.5 kilometers of highway infrastructure on an Engineering, Procurement, and Construction (EPC) basis.
+                        </p>
+
+                        <h3>2. Project Overview</h3>
+                        <p>
+                            The scope of work includes earthwork, pavement construction, drainage systems, retaining structures, safety measures, and all associated civil works as detailed in the technical specifications and drawings provided as part of this tender document.
+                        </p>
+
+                        <h3>3. Eligibility Criteria</h3>
+                        <p>
+                            Bidders must meet the following minimum requirements to be considered eligible for this project:
+                        </p>
+                        <ul>
+                            <li>Minimum average annual turnover of ₹50 Crores in the last 3 financial years (2022-23, 2023-24, 2024-25)</li>
+                            <li>Experience in completion of similar highway projects of not less than ₹40 Crores in the last 7 years</li>
+                            <li>Valid registration and licenses as per applicable regulations</li>
+                            <li>Technical and financial capability as per Section 3 of this RFP</li>
+                        </ul>
+
+                        <div class="annotation">
+                            <div class="annotation-author">Admin Note - Jan 10, 2026</div>
+                            <div class="annotation-text">
+                                Clarification added via Corrigendum-II: Both domestic and international projects are included in turnover calculation.
+                            </div>
+                        </div>
+
+                        <h3>4. Technical Specifications</h3>
+                        <p>
+                            All work shall be executed in accordance with the Ministry of Road Transport and Highways (MoRT&H) specifications and IRC codes. Specific technical requirements are detailed in Schedule B of this document.
+                        </p>
+
+                        <p>
+                            The contractor shall ensure quality control measures are implemented throughout the project duration, with regular testing and certification as per the quality assurance plan.
+                        </p>
+
+                        <h3>5. Payment Terms</h3>
+                        <p>
+                            Payments shall be made on a monthly basis based on the progress of work certified by the Engineer. The payment schedule includes milestone-based disbursements with retention as specified in Clause 8.2 of the contract agreement.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar - Thumbnails & Outline -->
+        <div class="sidebar-right">
+            <div class="tabs">
+                <button class="tab active" onclick="switchRightTab(0)">Pages</button>
+                <button class="tab" onclick="switchRightTab(1)">Outline</button>
+            </div>
+
+            <div class="tab-content" id="rightTab0">
+                <div class="thumbnail active">
+                    <div class="thumbnail-number">Page 1</div>
+                    <div class="thumbnail-preview">📄</div>
+                </div>
+
+                <div class="thumbnail">
+                    <div class="thumbnail-number">Page 2</div>
+                    <div class="thumbnail-preview">📄</div>
+                </div>
+
+                <div class="thumbnail">
+                    <div class="thumbnail-number">Page 3</div>
+                    <div class="thumbnail-preview">📄</div>
+                </div>
+
+                <div class="thumbnail">
+                    <div class="thumbnail-number">Page 4</div>
+                    <div class="thumbnail-preview">📄</div>
+                </div>
+
+                <div class="thumbnail">
+                    <div class="thumbnail-number">Page 5</div>
+                    <div class="thumbnail-preview">📄</div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="rightTab1" style="display: none;">
+                <div class="outline-item level-1">1. Introduction</div>
+                <div class="outline-item level-1">2. Project Overview</div>
+                <div class="outline-item level-1">3. Eligibility Criteria</div>
+                <div class="outline-item level-2">3.1 Financial Requirements</div>
+                <div class="outline-item level-2">3.2 Technical Experience</div>
+                <div class="outline-item level-1">4. Technical Specifications</div>
+                <div class="outline-item level-2">4.1 Earthwork</div>
+                <div class="outline-item level-2">4.2 Pavement Layers</div>
+                <div class="outline-item level-3">4.2.1 Sub-base</div>
+                <div class="outline-item level-3">4.2.2 Base Course</div>
+                <div class="outline-item level-1">5. Payment Terms</div>
+                <div class="outline-item level-2">5.1 Milestone Payments</div>
+                <div class="outline-item level-2">5.2 Retention Money</div>
+                <div class="outline-item level-1">6. Quality Standards</div>
+                <div class="outline-item level-1">7. Time Schedule</div>
+                <div class="outline-item level-1">8. Contract Agreement</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 12 of 13: Document Viewer</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_11_corrigendum_generator.html" style="color: #2a5298; text-decoration: none;">Corrigendum Generator</a></span>
+        </div>
+        <div>
+            <a href="screen_13_help.html" class="nav-button">Next: Help & Documentation →</a>
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 100;
+        let currentPage = 1;
+        const totalPages = 94;
+
+        function zoomIn() {
+            currentZoom += 10;
+            if (currentZoom > 200) currentZoom = 200;
+            document.getElementById('zoomLevel').textContent = currentZoom + '%';
+            updateZoom();
+        }
+
+        function zoomOut() {
+            currentZoom -= 10;
+            if (currentZoom < 50) currentZoom = 50;
+            document.getElementById('zoomLevel').textContent = currentZoom + '%';
+            updateZoom();
+        }
+
+        function updateZoom() {
+            const page = document.querySelector('.document-page');
+            page.style.transform = `scale(${currentZoom / 100})`;
+            page.style.transformOrigin = 'top center';
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                document.getElementById('pageInput').value = currentPage;
+                // In real implementation, would load next page
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                document.getElementById('pageInput').value = currentPage;
+                // In real implementation, would load previous page
+            }
+        }
+
+        function toggleFitWidth() {
+            alert('Fitting document to width...');
+        }
+
+        function toggleFitPage() {
+            alert('Fitting entire page to view...');
+        }
+
+        function toggleAnnotation() {
+            alert('Annotation mode activated. Click anywhere on the document to add a note.');
+        }
+
+        function highlightText() {
+            alert('Highlight mode activated. Select text to highlight.');
+        }
+
+        function downloadDoc() {
+            alert('Downloading NH-319_Arrah_Bypass_RFP.pdf...');
+        }
+
+        function printDoc() {
+            window.print();
+        }
+
+        function switchRightTab(tabIndex) {
+            // Hide all tabs
+            document.querySelectorAll('.sidebar-right .tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            document.querySelectorAll('.sidebar-right .tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById('rightTab' + tabIndex).style.display = 'block';
+            document.querySelectorAll('.sidebar-right .tab')[tabIndex].classList.add('active');
+        }
+    </script>
+</body>
+</html>

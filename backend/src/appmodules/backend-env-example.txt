@@ -1,0 +1,131 @@
+# ============================================================================
+# NHAI Tender Query Automation System
+# Backend Environment Configuration
+# ============================================================================
+#
+# Copy this file to .env and update with your actual values
+# File: backend/.env.example
+# ============================================================================
+
+# ============================================================================
+# APPLICATION CONFIGURATION
+# ============================================================================
+NODE_ENV=development
+PORT=3000
+APP_URL=http://localhost:3000
+
+# ============================================================================
+# DATABASE CONFIGURATION (PostgreSQL)
+# ============================================================================
+DB_HOST=localhost
+DB_PORT=5432
+DB_USERNAME=postgres
+DB_PASSWORD=your_password_here
+DB_DATABASE=nhai_tender_db
+DB_SYNCHRONIZE=false
+DB_LOGGING=false
+DB_SSL=false
+
+# ============================================================================
+# JWT AUTHENTICATION
+# ============================================================================
+JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=your_super_secret_refresh_key_change_this
+JWT_REFRESH_EXPIRES_IN=30d
+
+# ============================================================================
+# PYTHON RAG SERVICES
+# Screen 7: History Retriever (port 8000)
+# Screen 8: Chief Engineer Agent (port 8001)
+# ============================================================================
+SCREEN7_URL=http://localhost:8000
+SCREEN8_URL=http://localhost:8001
+
+# ============================================================================
+# VECTORIZATION CONFIGURATION
+# Background job settings for automatic query vectorization
+# ============================================================================
+VECTORIZATION_ENABLED=true
+VECTORIZATION_BATCH_SIZE=10
+VECTORIZATION_TIMEOUT=30000
+VECTORIZATION_MAX_RETRIES=3
+VECTORIZATION_RETRY_DELAY=2000
+VECTORIZATION_CRON=*/5 * * * *
+
+# ============================================================================
+# FILE UPLOAD CONFIGURATION
+# ============================================================================
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=52428800
+ALLOWED_FILE_TYPES=.pdf,.docx,.xlsx,.csv,.txt,.pptx
+
+# ============================================================================
+# CORS CONFIGURATION
+# ============================================================================
+CORS_ENABLED=true
+CORS_ORIGIN=http://localhost:3001
+CORS_CREDENTIALS=true
+
+# ============================================================================
+# RATE LIMITING
+# ============================================================================
+THROTTLE_TTL=60000
+THROTTLE_LIMIT=100
+
+# ============================================================================
+# LOGGING CONFIGURATION
+# ============================================================================
+LOG_LEVEL=info
+LOG_FILE_ENABLED=true
+LOG_FILE_PATH=./logs
+
+# ============================================================================
+# EMAIL CONFIGURATION (OPTIONAL)
+# For notifications and alerts
+# ============================================================================
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_app_password
+EMAIL_FROM=noreply@nhai.gov.in
+
+# ============================================================================
+# REDIS CONFIGURATION (OPTIONAL)
+# For caching and session storage
+# ============================================================================
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DB=0
+
+# ============================================================================
+# FRONTEND URL
+# For CORS and redirect purposes
+# ============================================================================
+FRONTEND_URL=http://localhost:3001
+
+# ============================================================================
+# ADMIN CONFIGURATION
+# ============================================================================
+ADMIN_EMAIL=admin@nhai.gov.in
+ADMIN_PASSWORD=change_this_in_production
+
+# ============================================================================
+# MONITORING & ANALYTICS (OPTIONAL)
+# ============================================================================
+SENTRY_DSN=
+ANALYTICS_ENABLED=false
+
+# ============================================================================
+# PRODUCTION SETTINGS
+# ============================================================================
+# When deploying to production, change these:
+# - NODE_ENV=production
+# - DB_SYNCHRONIZE=false (NEVER true in production!)
+# - DB_SSL=true
+# - Generate strong JWT secrets
+# - Set proper CORS_ORIGIN
+# - Enable proper logging
+# ============================================================================

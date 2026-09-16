@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - AI-Assisted Corrigendum Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #ff6b35;
+        }
+
+        .page-header-left h2 {
+            color: #1e3c72;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .page-header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .header-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .section-title {
+            color: #1e3c72;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-section {
+            margin-bottom: 25px;
+        }
+
+        .config-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            color: #555;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .suggested-changes {
+            margin-top: 20px;
+        }
+
+        .change-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #ff6b35;
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            transition: all 0.3s;
+        }
+
+        .change-item:hover {
+            background: #e8f0ff;
+            border-left-color: #2a5298;
+        }
+
+        .change-info {
+            flex: 1;
+        }
+
+        .change-title {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .change-description {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .generate-ai-btn {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 20px auto;
+        }
+
+        .generate-ai-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .corrigendum-editor {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            min-height: 400px;
+        }
+
+        .editor-header {
+            background: #1e3c72;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            margin: -25px -25px 20px -25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .editor-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .editor-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .corrigendum-content {
+            background: white;
+            padding: 30px;
+            border-radius: 6px;
+            min-height: 300px;
+            border: 1px solid #dee2e6;
+        }
+
+        .corrigendum-item {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .corrigendum-item:last-child {
+            border-bottom: none;
+        }
+
+        .corrigendum-number {
+            font-weight: 700;
+            color: #1e3c72;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .corrigendum-text {
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .corrigendum-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .editable-item {
+            background: #fffef7;
+            border: 2px dashed #2a5298;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .edit-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .edit-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+        }
+
+        .edit-textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .small-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .save-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .preview-section {
+            background: white;
+            padding: 30px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .preview-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1e3c72;
+        }
+
+        .preview-logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .preview-org {
+            color: #1e3c72;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .preview-title {
+            color: #1e3c72;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .preview-subtitle {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .final-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .btn-secondary {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .btn-secondary:hover {
+            background: #d0e0ff;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            display: none;
+        }
+
+        .success-box.show {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .success-icon {
+            font-size: 32px;
+        }
+
+        .success-content {
+            flex: 1;
+        }
+
+        .success-title {
+            font-weight: 600;
+            color: #155724;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .success-text {
+            color: #155724;
+            font-size: 13px;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .final-actions {
+                flex-direction: column;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India - Admin Portal</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_06_admin_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">Rajesh Kumar</div>
+                <div class="user-role">NHAI Administrator</div>
+            </div>
+            <div class="user-avatar">RK</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h2>📄 AI-Assisted Corrigendum Generator</h2>
+                <p>Generate corrigendum based on conformance check results and vendor queries</p>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="alert('Loading template...')">
+                    <span>📋</span>
+                    <span>Load Template</span>
+                </button>
+                <button class="header-btn" onclick="alert('Loading saved draft...')">
+                    <span>💾</span>
+                    <span>Load Draft</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Configuration Section -->
+        <div class="content-grid">
+            <!-- Left Column: Configuration -->
+            <div class="card">
+                <div class="section-title">⚙️ Corrigendum Configuration</div>
+
+                <div class="config-section">
+                    <label class="config-label">RFP Reference</label>
+                    <input type="text" class="input-field" value="NH-319 Arrah Bypass - EPC Mode" readonly>
+                </div>
+
+                <div class="config-section">
+                    <label class="config-label">Corrigendum Number</label>
+                    <input type="text" class="input-field" placeholder="e.g., Corrigendum-II" value="Corrigendum-II">
+                </div>
+
+                <div class="config-section">
+                    <label class="config-label">Issue Date</label>
+                    <input type="date" class="input-field" value="2026-01-12">
+                </div>
+
+                <div class="config-section">
+                    <label class="config-label">Bid Deadline Extension (Optional)</label>
+                    <input type="date" class="input-field" placeholder="New bid submission deadline">
+                </div>
+
+                <div class="config-section">
+                    <label class="config-label">Include Sources</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="conformance" checked>
+                            <label for="conformance">Issues from Conformance Check (21 items)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="queries" checked>
+                            <label for="queries">Vendor Pre-bid Queries (18 items)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="internal">
+                            <label for="internal">Internal Review Comments (5 items)</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: AI Suggestions -->
+            <div class="card">
+                <div class="section-title">💡 AI-Suggested Changes</div>
+                <div class="suggested-changes">
+                    <div class="change-item">
+                        <div class="change-info">
+                            <div class="change-title">Clause 2.4 - EMD Amount Specification</div>
+                            <div class="change-description">
+                                Add: "EMD Amount: ₹2.5 Crores. MSME registered companies are exempt as per government notification."
+                            </div>
+                        </div>
+                        <button class="add-btn" onclick="addToCorrigendum(1)">+ Add</button>
+                    </div>
+
+                    <div class="change-item">
+                        <div class="change-info">
+                            <div class="change-title">Clause 11.1 & 2.10 - RE Wall Clarification</div>
+                            <div class="change-description">
+                                Modify: "Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage 0+020 to 0+680. Refer modified clause 2.10 for TCS specifications."
+                            </div>
+                        </div>
+                        <button class="add-btn" onclick="addToCorrigendum(2)">+ Add</button>
+                    </div>
+
+                    <div class="change-item">
+                        <div class="change-info">
+                            <div class="change-title">Annexure - Geotechnical Investigation Report</div>
+                            <div class="change-description">
+                                Add: "Geotechnical investigation reports for all structure locations are attached as Annexure-A."
+                            </div>
+                        </div>
+                        <button class="add-btn" onclick="addToCorrigendum(3)">+ Add</button>
+                    </div>
+
+                    <div class="change-item">
+                        <div class="change-info">
+                            <div class="change-title">Clause 8.2 - Payment Milestone Details</div>
+                            <div class="change-description">
+                                Add: "Payment schedule: 15% on earthwork completion, 25% on base course, 30% on pavement layers, 20% on structures, 10% on completion."
+                            </div>
+                        </div>
+                        <button class="add-btn" onclick="addToCorrigendum(4)">+ Add</button>
+                    </div>
+
+                    <div class="change-item">
+                        <div class="change-info">
+                            <div class="change-title">Section 1.3 - Definitions of Abbreviations</div>
+                            <div class="change-description">
+                                Add: "TCS: Typical Cross Section, RE: Reinforced Earth, BHS: Both Hands Side, RHS: Right Hand Side, LHS: Left Hand Side"
+                            </div>
+                        </div>
+                        <button class="add-btn" onclick="addToCorrigendum(5)">+ Add</button>
+                    </div>
+                </div>
+
+                <button class="generate-ai-btn" onclick="generateAICorrigendum()">
+                    <span>🤖</span>
+                    <span>Generate AI Draft from All Sources</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Editor Section -->
+        <div class="card full-width">
+            <div class="corrigendum-editor">
+                <div class="editor-header">
+                    <div class="editor-title">📝 Corrigendum Editor</div>
+                    <div class="editor-actions">
+                        <button class="editor-btn" onclick="addNewItem()">+ Add Item</button>
+                        <button class="editor-btn" onclick="alert('Formatting options...')">Format</button>
+                        <button class="editor-btn" onclick="saveDraft()">💾 Save Draft</button>
+                    </div>
+                </div>
+
+                <div class="corrigendum-content" id="corrigendumContent">
+                    <!-- Corrigendum Item 1 -->
+                    <div class="corrigendum-item">
+                        <div class="corrigendum-number">1. Clause 11.1 of Schedule B - RE Wall Construction</div>
+                        <div class="corrigendum-text">
+                            <strong>Modification:</strong> Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B. For location 0+020 to 0+120, RE wall construction as per Clause 11.1 shall be followed.
+                        </div>
+                        <div class="corrigendum-meta">
+                            <span>📌 Reference: Page 45, Schedule B</span>
+                            <span>📊 Source: Conformance Check + Vendor Query</span>
+                        </div>
+                    </div>
+
+                    <!-- Corrigendum Item 2 -->
+                    <div class="corrigendum-item">
+                        <div class="corrigendum-number">2. Clause 2.4 - Earnest Money Deposit (EMD)</div>
+                        <div class="corrigendum-text">
+                            <strong>Addition:</strong> The Earnest Money Deposit (EMD) amount for this project is ₹2.5 Crores (Rupees Two Crores Fifty Lakhs Only). MSME registered companies and DPIIT recognized startups are exempt from EMD submission as per Government of India guidelines. Valid registration certificate must be submitted along with the bid.
+                        </div>
+                        <div class="corrigendum-meta">
+                            <span>📌 Reference: Page 15, Clause 2.4</span>
+                            <span>📊 Source: Conformance Check (Critical)</span>
+                        </div>
+                    </div>
+
+                    <!-- Corrigendum Item 3 -->
+                    <div class="corrigendum-item">
+                        <div class="corrigendum-number">3. Annexure A - Geotechnical Investigation Report</div>
+                        <div class="corrigendum-text">
+                            <strong>Addition:</strong> Geotechnical investigation reports for all structure locations including bridges, culverts, and retaining walls are provided as Annexure-A. Bidders are requested to review the soil investigation data for foundation design and cost estimation purposes.
+                        </div>
+                        <div class="corrigendum-meta">
+                            <span>📌 Reference: Technical Specifications</span>
+                            <span>📊 Source: Conformance Check (Critical)</span>
+                        </div>
+                    </div>
+
+                    <!-- Editable New Item -->
+                    <div class="editable-item" style="display: none;" id="newItemEditor">
+                        <div style="margin-bottom: 10px;">
+                            <strong style="font-size: 13px; color: #1e3c72;">Item Number & Title:</strong>
+                            <input type="text" class="input-field" placeholder="e.g., 4. Clause 8.2 - Payment Terms" style="margin-top: 5px;">
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong style="font-size: 13px; color: #1e3c72;">Content:</strong>
+                            <textarea class="edit-textarea" placeholder="Enter corrigendum content here..."></textarea>
+                        </div>
+                        <div class="edit-controls">
+                            <button class="small-btn save-btn">Save Item</button>
+                            <button class="small-btn cancel-btn" onclick="cancelNewItem()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="card full-width">
+            <div class="section-title">👁️ Corrigendum Preview</div>
+            <div class="preview-section">
+                <div class="preview-header">
+                    <div class="preview-logo">🏛️</div>
+                    <div class="preview-org">NATIONAL HIGHWAYS AUTHORITY OF INDIA</div>
+                    <div class="preview-title">CORRIGENDUM-II</div>
+                    <div class="preview-subtitle">Construction of four lane Arrah bypass (Asni to Baonpali) from Km 0+000 to Km 4+500 of NH-319</div>
+                    <div class="preview-subtitle" style="margin-top: 8px; font-weight: 600;">Date: January 12, 2026</div>
+                </div>
+
+                <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px;">
+                    <p style="font-size: 14px; color: #333; line-height: 1.6; margin-bottom: 10px;">
+                        Reference is invited to the RFP for the captioned project. The following modifications/clarifications are hereby issued:
+                    </p>
+                </div>
+
+                <div class="corrigendum-item">
+                    <div class="corrigendum-number">1. Clause 11.1 of Schedule B - RE Wall Construction</div>
+                    <div class="corrigendum-text">
+                        <strong>Modification:</strong> Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B. For location 0+020 to 0+120, RE wall construction as per Clause 11.1 shall be followed.
+                    </div>
+                </div>
+
+                <div class="corrigendum-item">
+                    <div class="corrigendum-number">2. Clause 2.4 - Earnest Money Deposit (EMD)</div>
+                    <div class="corrigendum-text">
+                        <strong>Addition:</strong> The Earnest Money Deposit (EMD) amount for this project is ₹2.5 Crores (Rupees Two Crores Fifty Lakhs Only). MSME registered companies and DPIIT recognized startups are exempt from EMD submission as per Government of India guidelines.
+                    </div>
+                </div>
+
+                <div class="corrigendum-item">
+                    <div class="corrigendum-number">3. Annexure A - Geotechnical Investigation Report</div>
+                    <div class="corrigendum-text">
+                        <strong>Addition:</strong> Geotechnical investigation reports for all structure locations including bridges, culverts, and retaining walls are provided as Annexure-A. Bidders are requested to review the soil investigation data for foundation design.
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e0e0e0;">
+                    <p style="font-size: 13px; color: #666; line-height: 1.6;">
+                        All other terms and conditions of the RFP remain unchanged. This corrigendum forms an integral part of the bid document.
+                    </p>
+                </div>
+
+                <div style="margin-top: 30px; text-align: right;">
+                    <div style="font-weight: 600; color: #1e3c72; margin-bottom: 40px;">
+                        [Digital Signature]
+                    </div>
+                    <div style="color: #666; font-size: 13px;">
+                        <strong>Authorized Signatory</strong><br>
+                        National Highways Authority of India
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Message (Hidden by default) -->
+        <div class="success-box" id="successMessage">
+            <div class="success-icon">✅</div>
+            <div class="success-content">
+                <div class="success-title">Corrigendum Generated Successfully!</div>
+                <div class="success-text">Your corrigendum document has been generated and is ready for publication.</div>
+            </div>
+        </div>
+
+        <!-- Final Actions -->
+        <div class="final-actions">
+            <button class="btn btn-secondary" onclick="saveDraft()">
+                <span>💾</span>
+                <span>Save as Draft</span>
+            </button>
+            <button class="btn btn-secondary" onclick="exportDocument()">
+                <span>📥</span>
+                <span>Download PDF</span>
+            </button>
+            <button class="btn btn-primary" onclick="publishCorrigendum()">
+                <span>🌐</span>
+                <span>Publish Corrigendum</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 11 of 13: Corrigendum Generator</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_10_conformance_checker.html" style="color: #2a5298; text-decoration: none;">Conformance Checker</a></span>
+        </div>
+        <div>
+            <a href="screen_12_document_viewer.html" class="nav-button">Next: Document Viewer →</a>
+        </div>
+    </div>
+
+    <script>
+        function addToCorrigendum(itemNum) {
+            alert(`Adding suggested change ${itemNum} to corrigendum...`);
+            event.target.innerHTML = '✓ Added';
+            event.target.style.background = '#28a745';
+            event.target.disabled = true;
+        }
+
+        function generateAICorrigendum() {
+            alert('Generating AI draft from all sources...\n\n- Conformance Check Issues: 21\n- Vendor Queries: 18\n- Internal Comments: 5\n\nTotal items to be processed: 44');
+        }
+
+        function addNewItem() {
+            document.getElementById('newItemEditor').style.display = 'block';
+        }
+
+        function cancelNewItem() {
+            document.getElementById('newItemEditor').style.display = 'none';
+        }
+
+        function saveDraft() {
+            alert('Corrigendum saved as draft!\n\nYou can continue editing later.');
+        }
+
+        function exportDocument() {
+            alert('Exporting corrigendum as PDF...\n\nDownload will start shortly.');
+        }
+
+        function publishCorrigendum() {
+            if (confirm('Are you sure you want to publish this corrigendum?\n\nThis will:\n- Publish on NHAI website\n- Send email notifications to all vendors\n- Update RFP documentation')) {
+                document.getElementById('successMessage').classList.add('show');
+                setTimeout(() => {
+                    alert('Corrigendum published successfully!\n\n- Posted on website\n- Emails sent to 156 vendors\n- Document archived');
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>

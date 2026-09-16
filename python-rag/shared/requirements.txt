@@ -1,0 +1,28 @@
+# NHAI RAG System - Shared Utilities Requirements
+# Python 3.10+
+
+# Core LangChain
+langchain>=0.1.0
+langchain-core>=0.1.0
+langchain-community>=0.0.13
+
+# LLM Providers
+langchain-openai>=0.0.5
+openai>=1.6.0
+
+# Embeddings
+sentence-transformers>=2.2.2
+tiktoken>=0.5.2
+
+# Vector Math
+numpy>=1.24.0
+
+# Ollama (local LLM support)
+# Note: Ollama must be installed separately on the system
+
+# Optional: HuggingFace Inference
+transformers>=4.35.0
+torch>=2.0.0
+
+# Utilities
+python-dotenv>=1.0.0

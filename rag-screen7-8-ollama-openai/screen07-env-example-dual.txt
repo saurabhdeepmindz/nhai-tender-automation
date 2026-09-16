@@ -1,0 +1,89 @@
+# ===========================================================================
+# NHAI Screen 7 (History Retriever) - Environment Configuration
+# Supports BOTH Ollama (Free) and OpenAI (Paid)
+# ===========================================================================
+
+# -----------------------------------------------------------------------------
+# PROVIDER SELECTION - Change this to switch between Ollama and OpenAI
+# -----------------------------------------------------------------------------
+# Options: "ollama" (free, local) or "openai" (paid, cloud)
+EMBEDDING_PROVIDER=ollama
+
+# -----------------------------------------------------------------------------
+# OLLAMA CONFIGURATION (Free, Local - Default)
+# -----------------------------------------------------------------------------
+# Ollama must be installed and running: https://ollama.ai
+# Download model: ollama pull nomic-embed-text
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+
+# -----------------------------------------------------------------------------
+# OPENAI CONFIGURATION (Paid, Cloud - Optional)
+# -----------------------------------------------------------------------------
+# To use OpenAI:
+# 1. Get API key from: https://platform.openai.com/api-keys
+# 2. Uncomment the line below and add your key
+# 3. Change EMBEDDING_PROVIDER=openai above
+# OPENAI_API_KEY=sk-your-openai-api-key-here
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+
+# Alternative OpenAI model (more expensive, better quality):
+# OPENAI_EMBEDDING_MODEL=text-embedding-3-large
+
+# -----------------------------------------------------------------------------
+# SERVER CONFIGURATION
+# -----------------------------------------------------------------------------
+HOST=0.0.0.0
+PORT=8000
+
+# -----------------------------------------------------------------------------
+# VECTOR STORE CONFIGURATION
+# -----------------------------------------------------------------------------
+VECTOR_STORE=chromadb
+CHROMA_DB_DIR=./chroma_db
+
+# Alternative vector stores (future):
+# VECTOR_STORE=faiss
+# VECTOR_STORE=weaviate
+
+# -----------------------------------------------------------------------------
+# PERFORMANCE TUNING
+# -----------------------------------------------------------------------------
+# Chunk size for document processing
+CHUNK_SIZE=1000
+CHUNK_OVERLAP=200
+
+# Batch size for embedding generation
+BATCH_SIZE=100
+
+# -----------------------------------------------------------------------------
+# CACHING
+# -----------------------------------------------------------------------------
+# Enable embedding cache to improve performance
+CACHE_ENABLED=true
+CACHE_DIR=./.cache
+
+# -----------------------------------------------------------------------------
+# LOGGING
+# -----------------------------------------------------------------------------
+LOG_LEVEL=INFO
+# Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# -----------------------------------------------------------------------------
+# NOTES:
+# -----------------------------------------------------------------------------
+# CURRENT SETUP: Using Ollama (free)
+# - No API costs
+# - 100% private (data stays local)
+# - Requires: Ollama installed + models downloaded
+#
+# TO SWITCH TO OPENAI:
+# 1. Change: EMBEDDING_PROVIDER=openai
+# 2. Add your: OPENAI_API_KEY=sk-...
+# 3. Restart service
+#
+# OLLAMA SETUP:
+# 1. Install: https://ollama.ai/download
+# 2. Run: ollama pull nomic-embed-text
+# 3. Verify: ollama list
+# ===========================================================================

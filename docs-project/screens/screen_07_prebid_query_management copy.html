@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - Prebid Query Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 100%;
+            margin: 0 auto;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid #ff6b35;
+        }
+
+        .page-header-left h2 {
+            color: #1e3c72;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .page-header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .generate-doc-btn {
+            background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .generate-doc-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(255, 107, 53, 0.5);
+        }
+
+        .filters-section {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .filter-btn {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            background: #1e3c72;
+        }
+
+        .filter-btn.clear {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .filter-btn.clear:hover {
+            background: #d0e0ff;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .bulk-action-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .bulk-action-btn:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        .query-table {
+            width: 100%;
+            min-width: 1800px;
+            border-collapse: collapse;
+        }
+
+        .query-table thead {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .query-table th {
+            text-align: left;
+            padding: 15px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .query-table th:last-child {
+            border-right: none;
+        }
+
+        .query-table th input[type="checkbox"] {
+            cursor: pointer;
+        }
+
+        .query-table td {
+            padding: 15px 12px;
+            font-size: 13px;
+            color: #333;
+            border-bottom: 1px solid #f0f0f0;
+            border-right: 1px solid #f8f8f8;
+            vertical-align: top;
+        }
+
+        .query-table td:last-child {
+            border-right: none;
+        }
+
+        .query-table tbody tr {
+            transition: all 0.3s;
+        }
+
+        .query-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .query-table tbody tr.accepted {
+            background: #e8f5e9;
+        }
+
+        .query-table tbody tr.rejected {
+            background: #ffebee;
+        }
+
+        .col-srno {
+            width: 60px;
+            text-align: center;
+            font-weight: 600;
+            color: #2a5298;
+        }
+
+        .col-checkbox {
+            width: 40px;
+            text-align: center;
+        }
+
+        .col-clause-ref {
+            width: 150px;
+        }
+
+        .col-page {
+            width: 80px;
+        }
+
+        .col-clause-title {
+            width: 180px;
+        }
+
+        .col-query {
+            width: 280px;
+        }
+
+        .col-ai-response {
+            width: 220px;
+        }
+
+        .col-past-ref {
+            width: 120px;
+        }
+
+        .col-past-response {
+            width: 200px;
+        }
+
+        .col-admin-response {
+            width: 300px;
+        }
+
+        .col-status {
+            width: 150px;
+        }
+
+        .text-cell {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #555;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .editable-cell {
+            position: relative;
+        }
+
+        .editable-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 8px;
+            border: 2px solid #2a5298;
+            border-radius: 5px;
+            font-size: 12px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+            background: #fffef7;
+        }
+
+        .editable-textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .view-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        .past-ref-link {
+            color: #2a5298;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .past-ref-link:hover {
+            text-decoration: underline;
+        }
+
+        .confidence-badge {
+            background: #e8f0ff;
+            color: #2a5298;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .status-dropdown {
+            width: 100%;
+            padding: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-dropdown.pending {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffc107;
+        }
+
+        .status-dropdown.accepted {
+            background: #d4edda;
+            color: #155724;
+            border-color: #28a745;
+        }
+
+        .status-dropdown.rejected {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #dc3545;
+        }
+
+        .status-dropdown:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .action-btn-small {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .action-btn-small:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px 30px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-section:last-child {
+            border-bottom: none;
+        }
+
+        .modal-section h4 {
+            color: #1e3c72;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .text-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2a5298;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .ai-response-box {
+            background: #e8f0ff;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .response-title {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 13px;
+        }
+
+        .copy-btn {
+            background: #2a5298;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #1e3c72;
+        }
+
+        .sources-box {
+            background: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border: 1px solid #d0e0ff;
+        }
+
+        .source-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .source-item {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+        }
+
+        .source-item:before {
+            content: '📄';
+            position: absolute;
+            left: 0;
+            font-size: 10px;
+        }
+
+        .modal-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            resize: vertical;
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .modal-btn.secondary:hover {
+            background: #d0e0ff;
+        }
+
+        .pagination {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .page-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            padding: 6px 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .page-btn:hover {
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        .page-btn.active {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+        }
+
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .filters-row {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-nav {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India - Admin Portal</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_06_admin_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">Rajesh Kumar</div>
+                <div class="user-role">NHAI Administrator</div>
+            </div>
+            <div class="user-avatar">RK</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+        <div class="main-container">
+            <div style="background:#e3f2fd;border-left:4px solid #1976d2;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#1976d2;font-weight:500;">
+                Section 1: Main Query Table & Statistics<br>
+                <span style="font-size:12px;color:#333;">API: <b>GET /api/prebid-queries</b> (Swagger: Paginated/filterable list of queries)<br>
+                API: <b>GET /api/prebid-queries/statistics</b> (Swagger: Query statistics summary, if shown)</span>
+            </div>
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h2>📝 Prebid Query Management</h2>
+                <p>Review AI-generated responses and manage vendor queries</p>
+            </div>
+            <button class="generate-doc-btn" onclick="window.location.href='screen_08_document_generation.html'">
+                <span>📄</span>
+                <span>Generate Prebid Response Document</span>
+            </button>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div style="background:#fff3e0;border-left:4px solid #ff9800;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#e65100;font-weight:500;">
+                Section 2: Filters & Dropdowns<br>
+                <span style="font-size:12px;color:#333;">API: <b>GET /api/prebid-queries/filters</b> (Swagger: Filter dropdown options)</span>
+            </div>
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label>🔍 Search</label>
+                    <input type="text" placeholder="Search by query ID, vendor, or keywords...">
+                </div>
+                <div class="filter-group">
+                    <label>RFP</label>
+                    <select>
+                        <option value="">All RFPs</option>
+                        <option value="rfp1" selected>NH-319 Arrah Bypass</option>
+                        <option value="rfp2">NH-30 Extension</option>
+                        <option value="rfp3">NH-48 Expansion</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select>
+                        <option value="">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select>
+                        <option value="">All Categories</option>
+                        <option value="technical">Technical</option>
+                        <option value="commercial">Commercial</option>
+                        <option value="eligibility">Eligibility</option>
+                        <option value="contractual">Contractual</option>
+                    </select>
+                </div>
+                <button class="filter-btn">Apply</button>
+                <button class="filter-btn clear">Clear</button>
+            </div>
+
+            <div class="bulk-actions">
+                <div style="background:#e0f7fa;border-left:4px solid #00838f;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#00838f;font-weight:500;">
+                    Section 3: Bulk Actions Toolbar<br>
+                    <span style="font-size:12px;color:#333;">API: <b>POST /api/prebid-queries/bulk/status</b> (Swagger: Bulk status update for selected queries)</span>
+                </div>
+                <span style="color: #666; font-size: 13px; font-weight: 600;">Bulk Actions:</span>
+                <button class="bulk-action-btn">✓ Accept Selected</button>
+                <button class="bulk-action-btn">✗ Reject Selected</button>
+                <button class="bulk-action-btn">👤 Assign to Admin</button>
+                <button class="bulk-action-btn">📥 Export Selected</button>
+            </div>
+        </div>
+
+        <!-- Main Query Table -->
+        <div class="table-container">
+            <div style="background:#fffde7;border-left:4px solid #fbc02d;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#fbc02d;font-weight:500;">
+                Section 4: Query Table Row Actions<br>
+                <span style="font-size:12px;color:#333;">View: <b>GET /api/prebid-queries/:id</b> | Status: <b>PATCH /api/prebid-queries/:id/status</b> | Admin Response: <b>POST /api/prebid-queries/:id/admin-response</b></span>
+            </div>
+            <table class="query-table">
+                <thead>
+                    <tr>
+                        <th class="col-checkbox"><input type="checkbox" id="selectAll"></th>
+                        <th class="col-srno">Sr.No</th>
+                        <th class="col-clause-ref">Clause of Ref</th>
+                        <th class="col-page">Page Number</th>
+                        <th class="col-clause-title">Clause</th>
+                        <th class="col-query">Description of Query</th>
+                        <th class="col-ai-response">AI Response</th>
+                        <th class="col-past-ref">Past RFP Reference</th>
+                        <th class="col-past-response">Past Response</th>
+                        <th class="col-admin-response">Admin AI Response</th>
+                        <th class="col-status">Admin Status</th>
+                    </tr>
+                    <tr style="background:#fff;">
+                        <td class="col-checkbox"></td>
+                        <td class="col-srno" style="font-size:11px;color:#1976d2;font-weight:500;">GET /api/prebid-queries (field: index)</td>
+                        <td class="col-clause-ref" style="font-size:11px;color:#1976d2;font-weight:500;">GET /api/prebid-queries (field: clause_ref)</td>
+                        <td class="col-page" style="font-size:11px;color:#1976d2;font-weight:500;">GET /api/prebid-queries (field: page_number)</td>
+                        <td class="col-clause-title" style="font-size:11px;color:#1976d2;font-weight:500;">GET /api/prebid-queries (field: clause_title)</td>
+                        <td class="col-query" style="font-size:11px;color:#1976d2;font-weight:500;">GET /api/prebid-queries (field: query_text)</td>
+                        <td class="col-ai-response" style="font-size:11px;color:#388e3c;font-weight:500;">GET /api/prebid-queries (field: ai_response)<br>POST /api/prebid-queries/:id/process (AI generation)</td>
+                        <td class="col-past-ref" style="font-size:11px;color:#8e24aa;font-weight:500;">GET /api/prebid-queries/:id/history (field: past_rfp_ref)</td>
+                        <td class="col-past-response" style="font-size:11px;color:#8e24aa;font-weight:500;">GET /api/prebid-queries/:id/history (field: past_response)</td>
+                        <td class="col-admin-response" style="font-size:11px;color:#d84315;font-weight:500;">GET /api/prebid-queries (field: admin_response)<br>POST /api/prebid-queries/:id/admin-response (save)</td>
+                        <td class="col-status" style="font-size:11px;color:#fbc02d;font-weight:500;">GET /api/prebid-queries (field: status)<br>PATCH /api/prebid-queries/:id/status (update)</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Query Row 1 -->
+                    <tr class="accepted">
+                        <td class="col-checkbox"><input type="checkbox"></td>
+                        <td class="col-srno">1</td>
+                        <td class="col-clause-ref">Schedule B, Clause 11.1</td>
+                        <td class="col-page">45</td>
+                        <td class="col-clause-title">RE Wall Construction</td>
+                        <td class="col-query">
+                            <div class="text-cell">
+                                Kindly take note of Page no. 45 of 94, clause 11.1 of Schedule B of CA, where in sl. No. 1, the chainage mentioned is 0+020 to 0+680 BHS, RE wall is proposed...
+                            </div>
+                            <button class="view-btn" onclick="openQueryModal(1)">View Full</button>
+                        </td>
+                        <td class="col-ai-response">
+                            <div class="text-cell">
+                                Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II...
+                            </div>
+                            <span class="confidence-badge">92% Match</span>
+                        </td>
+                        <td class="col-past-ref">
+                            <a href="#" class="past-ref-link">
+                                <span>📁</span>
+                                <span>RFP001</span>
+                            </a>
+                        </td>
+                        <td class="col-past-response">
+                            <div class="text-cell">
+                                It will be provided through Corrigendum regarding RE wall specifications and TCS requirements.
+                            </div>
+                            <button class="view-btn" onclick="alert('View past response details')">View</button>
+                        </td>
+                        <td class="col-admin-response">
+                            <div class="editable-cell">
+                                <textarea class="editable-textarea" id="admin-response-1">Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B</textarea>
+                            </div>
+                        </td>
+                        <td class="col-status">
+                            <select class="status-dropdown accepted" onchange="updateRowStatus(this, 1)">
+                                <option value="pending">Pending</option>
+                                <option value="accepted" selected>✓ Accepted</option>
+                                <option value="rejected">✗ Rejected</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Query Row 2 -->
+                    <tr>
+                        <td class="col-checkbox"><input type="checkbox"></td>
+                        <td class="col-srno">2</td>
+                        <td class="col-clause-ref">General</td>
+                        <td class="col-page">10</td>
+                        <td class="col-clause-title">Geotechnical Investigation Report</td>
+                        <td class="col-query">
+                            <div class="text-cell">
+                                Kindly furnish geotechnical investigation report for structure locations as mentioned in the RFP document...
+                            </div>
+                            <button class="view-btn" onclick="openQueryModal(2)">View Full</button>
+                        </td>
+                        <td class="col-ai-response">
+                            <div class="text-cell">
+                                It will be provided through Corrigendum. The detailed geotechnical reports will be shared with all bidders.
+                            </div>
+                            <span class="confidence-badge">87% Match</span>
+                        </td>
+                        <td class="col-past-ref">
+                            <a href="#" class="past-ref-link">
+                                <span>📁</span>
+                                <span>RFP001</span>
+                            </a>
+                        </td>
+                        <td class="col-past-response">
+                            <div class="text-cell">
+                                Same as AI response in editable format - will be provided through corrigendum.
+                            </div>
+                            <button class="view-btn" onclick="alert('View past response details')">View</button>
+                        </td>
+                        <td class="col-admin-response">
+                            <div class="editable-cell">
+                                <textarea class="editable-textarea" id="admin-response-2">It will be provided through Corrigendum</textarea>
+                            </div>
+                        </td>
+                        <td class="col-status">
+                            <select class="status-dropdown pending" onchange="updateRowStatus(this, 2)">
+                                <option value="pending" selected>⏳ Pending Review</option>
+                                <option value="accepted">✓ Accepted</option>
+                                <option value="rejected">✗ Rejected</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Query Row 3 -->
+                    <tr>
+                        <td class="col-checkbox"><input type="checkbox"></td>
+                        <td class="col-srno">3</td>
+                        <td class="col-clause-ref">Schedule B, Clause 11.1</td>
+                        <td class="col-page">45</td>
+                        <td class="col-clause-title">RE Wall - Location Clarification</td>
+                        <td class="col-query">
+                            <div class="text-cell">
+                                For the location 0+040 to 0+220 RHS and 0+040 to 0+220 LHS, which TCS is to be followed and RE wall construction requirements...
+                            </div>
+                            <button class="view-btn" onclick="openQueryModal(3)">View Full</button>
+                        </td>
+                        <td class="col-ai-response">
+                            <div class="text-cell">
+                                Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10...
+                            </div>
+                            <span class="confidence-badge">95% Match</span>
+                        </td>
+                        <td class="col-past-ref">
+                            <a href="#" class="past-ref-link">
+                                <span>📁</span>
+                                <span>RFP001</span>
+                            </a>
+                        </td>
+                        <td class="col-past-response">
+                            <div class="text-cell">
+                                Cl.11.1 of schedule-B of CA to be followed for RE wall specifications. TCS requirements clarified in corrigendum.
+                            </div>
+                            <button class="view-btn" onclick="alert('View past response details')">View</button>
+                        </td>
+                        <td class="col-admin-response">
+                            <div class="editable-cell">
+                                <textarea class="editable-textarea" id="admin-response-3">Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B</textarea>
+                            </div>
+                        </td>
+                        <td class="col-status">
+                            <select class="status-dropdown pending" onchange="updateRowStatus(this, 3)">
+                                <option value="pending" selected>⏳ Pending Review</option>
+                                <option value="accepted">✓ Accepted</option>
+                                <option value="rejected">✗ Rejected</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Query Row 4 -->
+                    <tr>
+                        <td class="col-checkbox"><input type="checkbox"></td>
+                        <td class="col-srno">4</td>
+                        <td class="col-clause-ref">Clause 2.4</td>
+                        <td class="col-page">15</td>
+                        <td class="col-clause-title">EMD Exemption Criteria</td>
+                        <td class="col-query">
+                            <div class="text-cell">
+                                What are the EMD exemption criteria for MSME registered companies? Please provide detailed guidelines...
+                            </div>
+                            <button class="view-btn" onclick="openQueryModal(4)">View Full</button>
+                        </td>
+                        <td class="col-ai-response">
+                            <div class="text-cell">
+                                As per government guidelines, MSME registered companies and DPIIT recognized startups are exempt from EMD requirements...
+                            </div>
+                            <span class="confidence-badge">78% Match</span>
+                        </td>
+                        <td class="col-past-ref">
+                            <a href="#" class="past-ref-link">
+                                <span>📁</span>
+                                <span>RFP003</span>
+                            </a>
+                        </td>
+                        <td class="col-past-response">
+                            <div class="text-cell">
+                                MSME exemption as per government notification. Certificate to be submitted with bid.
+                            </div>
+                            <button class="view-btn" onclick="alert('View past response details')">View</button>
+                        </td>
+                        <td class="col-admin-response">
+                            <div class="editable-cell">
+                                <textarea class="editable-textarea" id="admin-response-4">As per government guidelines, MSME registered companies are exempt from EMD. Valid registration certificate must be submitted.</textarea>
+                            </div>
+                        </td>
+                        <td class="col-status">
+                            <select class="status-dropdown pending" onchange="updateRowStatus(this, 4)">
+                                <option value="pending" selected>⏳ Pending Review</option>
+                                <option value="accepted">✓ Accepted</option>
+                                <option value="rejected">✗ Rejected</option>
+                            </select>
+                        </td>
+                    </tr>
+
+                    <!-- Query Row 5 -->
+                    <tr>
+                        <td class="col-checkbox"><input type="checkbox"></td>
+                        <td class="col-srno">5</td>
+                        <td class="col-clause-ref">Section 3.1</td>
+                        <td class="col-page">12</td>
+                        <td class="col-clause-title">Eligibility - Turnover Requirements</td>
+                        <td class="col-query">
+                            <div class="text-cell">
+                                Please clarify minimum turnover requirements for past 3 financial years. Does it include international projects?
+                            </div>
+                            <button class="view-btn" onclick="openQueryModal(5)">View Full</button>
+                        </td>
+                        <td class="col-ai-response">
+                            <div class="text-cell">
+                                Minimum average annual turnover of ₹50 Crores required for last 3 financial years. Both domestic and international projects...
+                            </div>
+                            <span class="confidence-badge">85% Match</span>
+                        </td>
+                        <td class="col-past-ref">
+                            <a href="#" class="past-ref-link">
+                                <span>📁</span>
+                                <span>RFP002</span>
+                            </a>
+                        </td>
+                        <td class="col-past-response">
+                            <div class="text-cell">
+                                Turnover includes both domestic and international projects as per audited financial statements.
+                            </div>
+                            <button class="view-btn" onclick="alert('View past response details')">View</button>
+                        </td>
+                        <td class="col-admin-response">
+                            <div class="editable-cell">
+                                <textarea class="editable-textarea" id="admin-response-5">Minimum average annual turnover of ₹50 Crores in last 3 financial years. Both domestic and international projects are included.</textarea>
+                            </div>
+                        </td>
+                        <td class="col-status">
+                            <select class="status-dropdown pending" onchange="updateRowStatus(this, 5)">
+                                <option value="pending" selected>⏳ Pending Review</option>
+                                <option value="accepted">✓ Accepted</option>
+                                <option value="rejected">✗ Rejected</option>
+                            </select>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <div class="pagination-info">
+                Showing 1 to 5 of 18 queries
+            </div>
+            <div class="pagination-controls">
+                <button class="page-btn" disabled>← Previous</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Query Detail Modal -->
+    <div class="modal" id="queryModal">
+        <div style="background:#f3e5f5;border-left:4px solid #8e24aa;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#8e24aa;font-weight:500;">
+            Section 5: Query Details Modal<br>
+            <span style="font-size:12px;color:#333;">API: <b>GET /api/prebid-queries/:id</b> | History: <b>GET /api/prebid-queries/:id/history</b> | Similar: <b>GET /api/prebid-queries/:id/similar</b> | AI Process: <b>POST /api/prebid-queries/:id/process</b> | Admin Response: <b>POST /api/prebid-queries/:id/admin-response</b></span>
+        </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Query Details - Sr.No 1</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- Query Information -->
+                <div class="modal-section">
+                    <h4>📋 Query Information</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Sr. No</span>
+                            <span class="info-value">1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vendor</span>
+                            <span class="info-value">ABC Construction Ltd.</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Clause Reference</span>
+                            <span class="info-value">Schedule B, Clause 11.1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Page Number</span>
+                            <span class="info-value">45</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Clause Title</span>
+                            <span class="info-value">RE Wall Construction</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Category</span>
+                            <span class="info-value">Technical Specifications</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Submitted Date</span>
+                            <span class="info-value">Jan 10, 2026, 10:30 AM</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">RFP</span>
+                            <span class="info-value">NH-319 Arrah Bypass - EPC Mode</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full Query Text -->
+                <div class="modal-section">
+                    <h4>❓ Vendor Query</h4>
+                    <div class="text-box">
+                        Kindly take note of Page no. 45 of 94, clause 11.1 of Schedule B of CA, where in sl. No. 1, the chainage mentioned is 0+020 to 0+680 BHS, RE wall is proposed for this location, but in page no. 28 of 94, clause 2.10, sl. No. 2, TCS 3A is proposed for the location 0.120 to 0.980. Thus, for the location 0.020 to 0.120, RE wall is to be constructed or not, please clarify.
+                    </div>
+                </div>
+
+                <!-- AI Generated Response -->
+                <div class="modal-section">
+                    <h4>🤖 AI-Generated Response</h4>
+                    <div class="ai-response-box">
+                        <div class="response-header">
+                            <span class="response-title">AI Response (92% Historical Match)</span>
+                            <button class="copy-btn" onclick="copyAIResponse()">📋 Copy to Admin Field</button>
+                        </div>
+                        <div class="text-box" style="border-left-color: #28a745; background: white;">
+                            Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B.
+                        </div>
+                        <div class="sources-box">
+                            <div class="source-title">📚 AI References:</div>
+                            <div class="source-item">Schedule B, Clause 11.1 - RE Wall Specifications (Page 45)</div>
+                            <div class="source-item">Corrigendum-II, Modified Clause 2.10 (Page 28)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historical Reference -->
+                <div class="modal-section">
+                    <h4>📁 Historical Reference - RFP001</h4>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Past RFP</span>
+                            <span class="info-value">RFP001 - NH-30 Project</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Similarity Score</span>
+                            <span class="info-value">92%</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <strong style="font-size: 13px; color: #666;">Past Query:</strong>
+                        <div class="text-box" style="margin-top: 8px;">
+                            RE wall chainage clarification for section 0+020 to 0+680...
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <strong style="font-size: 13px; color: #666;">Past Response:</strong>
+                        <div class="text-box" style="margin-top: 8px;">
+                            It will be provided through Corrigendum regarding RE wall specifications and TCS requirements.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Response Editor -->
+                <div class="modal-section">
+                    <h4>✏️ Edit Admin Response</h4>
+                    <textarea class="modal-textarea" id="modalAdminResponse">Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B</textarea>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="modal-actions">
+                    <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+                    <button class="modal-btn secondary">Save Draft</button>
+                    <button class="modal-btn primary" onclick="acceptAndClose()">✓ Accept & Approve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Navigation -->
+    <div style="background:#fbe9e7;border-left:4px solid #d84315;padding:6px 12px;margin:24px 0 0 0;font-size:13px;color:#d84315;font-weight:500;">
+        Section 6: Pagination Controls & Document Generation<br>
+        <span style="font-size:12px;color:#333;">API: <b>GET /api/prebid-queries?page=1&pageSize=20</b> | Generate Document: <b>POST /api/prebid-queries/generate-document</b> (Screen 8)</span>
+    </div>
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen 7 of 13: Prebid Query Management</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_06_admin_dashboard.html" style="color: #2a5298; text-decoration: none;">Admin Dashboard</a></span>
+        </div>
+        <div>
+            <a href="screen_08_document_generation.html" class="nav-button">Next: Document Generation →</a>
+        </div>
+    </div>
+
+    <script>
+        // Select all checkbox
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        // Update row status based on dropdown
+        function updateRowStatus(select, rowNum) {
+            const row = select.closest('tr');
+            row.className = '';
+            
+            if (select.value === 'accepted') {
+                row.classList.add('accepted');
+                select.className = 'status-dropdown accepted';
+            } else if (select.value === 'rejected') {
+                row.classList.add('rejected');
+                select.className = 'status-dropdown rejected';
+            } else {
+                select.className = 'status-dropdown pending';
+            }
+        }
+
+        // Open query detail modal
+        function openQueryModal(queryNum) {
+            document.getElementById('queryModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('queryModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Copy AI response to admin field
+        function copyAIResponse() {
+            const aiText = "Cl.11.1 of schedule-B of CA to be followed for RE wall Chainage, please refer corrigendum –II for modified clause 2.10 of Schedule-B";
+            document.getElementById('modalAdminResponse').value = aiText;
+            alert('AI response copied to admin field!');
+        }
+
+        // Accept and close
+        function acceptAndClose() {
+            alert('Query response accepted and saved!');
+            closeModal();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('queryModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

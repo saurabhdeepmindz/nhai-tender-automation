@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NHAI - Historical Data Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #ffffff;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: #1e3c72;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .header-text h1 {
+            color: #1e3c72;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .header-text p {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            color: #1e3c72;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .back-btn {
+            background: #e8f0ff;
+            color: #2a5298;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #d0e0ff;
+        }
+
+        .main-container {
+            flex: 1;
+            padding: 30px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-left: 5px solid #ff6b35;
+        }
+
+        .page-header h2 {
+            color: #1e3c72;
+            font-size: 26px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Statistics Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, rgba(255,107,53,0.1) 0%, transparent 100%);
+            border-radius: 0 0 0 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+        .stat-card.historical {
+            border-left-color: #2a5298;
+        }
+
+        .stat-card.live {
+            border-left-color: #28a745;
+        }
+
+        .stat-card.total {
+            border-left-color: #ff6b35;
+        }
+
+        .stat-card.referenced {
+            border-left-color: #6c5ce7;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-title {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            font-size: 32px;
+            opacity: 0.8;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .stat-breakdown {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .breakdown-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .breakdown-value {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .breakdown-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .tabs-header {
+            display: flex;
+            border-bottom: 2px solid #f0f0f0;
+            padding: 0 25px;
+        }
+
+        .tab {
+            padding: 18px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: #2a5298;
+            background: #f8f9fa;
+        }
+
+        .tab.active {
+            color: #2a5298;
+            border-bottom-color: #2a5298;
+            background: #f8f9fa;
+        }
+
+        .tab-badge {
+            background: #ff6b35;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tab.active .tab-badge {
+            background: #2a5298;
+        }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f1f8e9 100%);
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 2px dashed #2a5298;
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .upload-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .upload-type-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+
+        .upload-type-card:hover {
+            border-color: #2a5298;
+            box-shadow: 0 4px 12px rgba(42,82,152,0.2);
+            transform: translateY(-3px);
+        }
+
+        .upload-type-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .upload-type-icon {
+            font-size: 32px;
+        }
+
+        .upload-type-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .upload-type-desc {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .upload-type-formats {
+            font-size: 11px;
+            color: #999;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        .upload-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .upload-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .upload-btn.primary {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+        }
+
+        .upload-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(42,82,152,0.4);
+        }
+
+        .upload-btn.secondary {
+            background: white;
+            color: #2a5298;
+            border: 2px solid #2a5298;
+        }
+
+        .upload-btn.secondary:hover {
+            background: #e8f0ff;
+        }
+
+        /* Data Table */
+        .data-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .action-btn.filter {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .action-btn.export {
+            background: #28a745;
+            color: white;
+        }
+
+        .action-btn.refresh {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .search-filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #2a5298;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+
+        .data-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .data-table td {
+            padding: 15px 12px;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-badge.processed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-badge.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .reference-count {
+            background: #e8f0ff;
+            color: #2a5298;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .table-action-btn.view {
+            background: #e8f0ff;
+            color: #2a5298;
+        }
+
+        .table-action-btn.edit {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .table-action-btn.delete {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .table-action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Most Referenced Section */
+        .referenced-section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .referenced-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .referenced-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #6c5ce7;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .referenced-item:hover {
+            background: #e8f0ff;
+            transform: translateX(5px);
+        }
+
+        .referenced-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .referenced-rfp {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+        }
+
+        .referenced-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .referenced-stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Upload History */
+        .upload-history {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .history-timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .history-timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #2a5298 0%, transparent 100%);
+        }
+
+        .history-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #2a5298;
+        }
+
+        .history-item::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            background: #2a5298;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #2a5298;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-title {
+            font-weight: 600;
+            color: #1e3c72;
+            font-size: 14px;
+        }
+
+        .history-time {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .history-details {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .history-meta {
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
+            font-size: 11px;
+            color: #999;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+        }
+
+        .page-btn:hover {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+        }
+
+        .page-btn.active {
+            background: #2a5298;
+            color: white;
+            border-color: #2a5298;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        .footer-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer-nav-left {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .screen-info {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+
+        .nav-button {
+            padding: 8px 20px;
+            background: #2a5298;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .nav-button:hover {
+            background: #1e3c72;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .stats-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .upload-types {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .stats-dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-header {
+                overflow-x: auto;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-container">
+                <div class="logo">NHAI</div>
+                <div class="header-text">
+                    <h1>AI-Driven Tender Query Automation System</h1>
+                    <p>National Highways Authority of India</p>
+                </div>
+            </div>
+        </div>
+        <div class="user-profile">
+            <a href="screen_06_admin_dashboard.html" class="back-btn">
+                ← Back to Dashboard
+            </a>
+            <div class="user-info">
+                <div class="user-name">Admin User</div>
+                <div class="user-role">System Administrator</div>
+            </div>
+            <div class="user-avatar">AU</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h2>📚 Historical Data Management</h2>
+            <p>Upload and manage historical RFPs, pre-bid queries, responses, and corrigenda for AI knowledge base</p>
+        </div>
+
+        <!-- SECTION 1: Statistics Dashboard -->
+        <!-- API: GET /historical-data/stats/summary (Swagger: Enhanced statistics for all uploaded documents) -->
+        <div class="stats-dashboard">
+            <div style="background:#e3f2fd;border-left:4px solid #1976d2;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#1976d2;font-weight:500;">
+                Section 1: Statistics Dashboard<br>
+                <span style="font-size:12px;color:#333;">API: <b>GET /historical-data/stats/summary</b> (Swagger: Enhanced statistics for all uploaded documents)</span>
+            </div>
+            <div class="stat-card historical">
+                <div class="stat-header">
+                    <span class="stat-title">Historical Data (Pre Go-Live)</span>
+                    <span class="stat-icon">📦</span>
+                </div>
+                <div class="stat-value">342</div>
+                <div class="stat-breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">127</div>
+                        <div class="breakdown-label">RFPs</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">183</div>
+                        <div class="breakdown-label">Q&A</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">32</div>
+                        <div class="breakdown-label">Corrigenda</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card live">
+                <div class="stat-header">
+                    <span class="stat-title">Live Data (Post Go-Live)</span>
+                    <span class="stat-icon">🔴</span>
+                </div>
+                <div class="stat-value">89</div>
+                <div class="stat-breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">15</div>
+                        <div class="breakdown-label">RFPs</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">68</div>
+                        <div class="breakdown-label">Q&A</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">6</div>
+                        <div class="breakdown-label">Corrigenda</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card total">
+                <div class="stat-header">
+                    <span class="stat-title">Total Knowledge Base</span>
+                    <span class="stat-icon">📊</span>
+                </div>
+                <div class="stat-value">431</div>
+                <div class="stat-breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">142</div>
+                        <div class="breakdown-label">RFPs</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">251</div>
+                        <div class="breakdown-label">Q&A</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">38</div>
+                        <div class="breakdown-label">Corrigenda</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card referenced">
+                <div class="stat-header">
+                    <span class="stat-title">AI References Used</span>
+                    <span class="stat-icon">🤖</span>
+                </div>
+                <div class="stat-value">1,247</div>
+                <div class="stat-breakdown">
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">68</div>
+                        <div class="breakdown-label">This Month</div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="breakdown-value">89%</div>
+                        <div class="breakdown-label">Accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: Tabs Container (Historical, Live, Referenced, Upload History) -->
+        <!-- API: GET /historical-data (Swagger: Paginated/filterable list of documents; filter by type/status for each tab) -->
+        <div class="tabs-container">
+            <div style="background:#fff3e0;border-left:4px solid #ff9800;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#e65100;font-weight:500;">
+                Section 2: Tabs (Historical, Live, Referenced, Upload History)<br>
+                <span style="font-size:12px;color:#333;">API: <b>GET /historical-data</b> (Swagger: Paginated/filterable list; filter by type/status for each tab)</span>
+            </div>
+            <div class="tabs-header">
+                <div class="tab active" onclick="switchTab('historical')">
+                    <span>📦 Historical Data</span>
+                    <span class="tab-badge">342</span>
+                </div>
+                <div class="tab" onclick="switchTab('live')">
+                    <span>🔴 Live Data</span>
+                    <span class="tab-badge">89</span>
+                </div>
+                <div class="tab" onclick="switchTab('referenced')">
+                    <span>⭐ Most Referenced</span>
+                    <span class="tab-badge">25</span>
+                </div>
+                <div class="tab" onclick="switchTab('history')">
+                    <span>📝 Upload History</span>
+                </div>
+            </div>
+
+            <!-- Tab 1: Historical Data -->
+            <!-- SECTION 2A: Historical Data Table & Actions -->
+            <!-- API: GET /historical-data (with filters for historical data) -->
+            <div class="tab-content active" id="historical">
+                <!-- SECTION 3: Upload Section (Bulk/Single Upload) -->
+                <!-- API: POST /historical-data/upload (Swagger: Multipart form upload for RFP, Q&A, Corrigendum) -->
+                <div class="upload-section">
+                    <div style="background:#e8f5e9;border-left:4px solid #388e3c;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#388e3c;font-weight:500;">
+                        Section 3: Upload Section (Bulk/Single Upload)<br>
+                        <span style="font-size:12px;color:#333;">API: <b>POST /historical-data/upload</b> (Swagger: Multipart form upload for RFP, Q&A, Corrigendum)</span>
+                    </div>
+                    <div class="upload-header">
+                        <div class="upload-title">
+                            <span>📤</span>
+                            <span>Upload Historical Data (Pre Go-Live)</span>
+                        </div>
+                    </div>
+
+                    <div class="upload-types">
+                        <div class="upload-type-card" onclick="uploadType('rfp')">
+                            <div class="upload-type-header">
+                                <div class="upload-type-icon">📁</div>
+                                <div class="upload-type-title">RFP Documents</div>
+                            </div>
+                            <div class="upload-type-desc">
+                                Upload historical RFP/Tender documents including SBDs, specifications, and annexures
+                            </div>
+                            <div class="upload-type-formats">
+                                <strong>Formats:</strong> PDF, DOCX, TXT • <strong>Max Size:</strong> 50MB
+                            </div>
+                        </div>
+
+                        <div class="upload-type-card" onclick="uploadType('qa')">
+                            <div class="upload-type-header">
+                                <div class="upload-type-icon">❓</div>
+                                <div class="upload-type-title">Pre-Bid Q&A</div>
+                            </div>
+                            <div class="upload-type-desc">
+                                Upload historical pre-bid queries and their responses in structured format
+                            </div>
+                            <div class="upload-type-formats">
+                                <strong>Formats:</strong> CSV, XLSX, PDF • <strong>Max Size:</strong> 20MB
+                            </div>
+                        </div>
+
+                        <div class="upload-type-card" onclick="uploadType('corrigendum')">
+                            <div class="upload-type-header">
+                                <div class="upload-type-icon">📝</div>
+                                <div class="upload-type-title">Corrigenda</div>
+                            </div>
+                            <div class="upload-type-desc">
+                                Upload corrigendum documents with amendments and clarifications
+                            </div>
+                            <div class="upload-type-formats">
+                                <strong>Formats:</strong> PDF, DOCX • <strong>Max Size:</strong> 10MB
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="upload-btn-group">
+                        <button class="upload-btn primary">
+                            <span>📁</span>
+                            <span>Bulk Upload (ZIP)</span>
+                        </button>
+                        <button class="upload-btn secondary">
+                            <span>📊</span>
+                            <span>Download Template</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <!-- SECTION 4: Table Row Actions (View, Edit, Delete) -->
+                <!-- View: GET /historical-data/:id | Delete: DELETE /historical-data/:id | Edit: (PUT /historical-data/:id if implemented) -->
+                <div class="data-section">
+                    <div style="background:#fffde7;border-left:4px solid #fbc02d;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#fbc02d;font-weight:500;">
+                        Section 4: Table Row Actions (View, Edit, Delete)<br>
+                        <span style="font-size:12px;color:#333;">View: <b>GET /historical-data/:id</b> | Delete: <b>DELETE /historical-data/:id</b> | Edit: <b>PUT /historical-data/:id</b> (if implemented)</span>
+                    </div>
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span>📋</span>
+                            <span>Historical Data Repository</span>
+                        </div>
+                        <div class="section-actions">
+                            <button class="action-btn filter">
+                                <span>🔍</span>
+                                <span>Filter</span>
+                            </button>
+                            <button class="action-btn export">
+                                <span>📥</span>
+                                <span>Export</span>
+                            </button>
+                            <button class="action-btn refresh">
+                                <span>🔄</span>
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-filter-bar">
+                        <input type="text" class="search-input" placeholder="🔍 Search by RFP number, title, or keyword...">
+                        <select class="filter-select">
+                            <option>All Types</option>
+                            <option>RFP Documents</option>
+                            <option>Pre-Bid Q&A</option>
+                            <option>Corrigenda</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Status</option>
+                            <option>Processed</option>
+                            <option>Pending</option>
+                            <option>Error</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>All Years</option>
+                            <option>2024</option>
+                            <option>2023</option>
+                            <option>2022</option>
+                            <option>2021</option>
+                        </select>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>RFP Number</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Upload Date</th>
+                                <th>Status</th>
+                                <th>AI References</th>
+                                <th>Size</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>RFP-2022-NH-089</strong></td>
+                                <td>NH-24 Delhi-Lucknow Highway Expansion</td>
+                                <td>RFP Document</td>
+                                <td>Dec 15, 2024</td>
+                                <td><span class="status-badge processed">Processed</span></td>
+                                <td><span class="reference-count">🔍 47 refs</span></td>
+                                <td>12.5 MB</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2023-NH-145</strong></td>
+                                <td>Mumbai-Pune Expressway Q&A Session 2</td>
+                                <td>Pre-Bid Q&A</td>
+                                <td>Dec 14, 2024</td>
+                                <td><span class="status-badge processed">Processed</span></td>
+                                <td><span class="reference-count">🔍 89 refs</span></td>
+                                <td>3.2 MB</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2022-NH-089</strong></td>
+                                <td>Corrigendum-2: Technical Specifications</td>
+                                <td>Corrigendum</td>
+                                <td>Dec 13, 2024</td>
+                                <td><span class="status-badge processed">Processed</span></td>
+                                <td><span class="reference-count">🔍 23 refs</span></td>
+                                <td>1.8 MB</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2021-NH-067</strong></td>
+                                <td>Chennai-Bangalore Highway Upgrade</td>
+                                <td>RFP Document</td>
+                                <td>Dec 12, 2024</td>
+                                <td><span class="status-badge pending">Pending</span></td>
+                                <td><span class="reference-count">🔍 0 refs</span></td>
+                                <td>15.7 MB</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2023-NH-201</strong></td>
+                                <td>Pre-Bid Meeting Minutes - Kolkata Ring Road</td>
+                                <td>Pre-Bid Q&A</td>
+                                <td>Dec 11, 2024</td>
+                                <td><span class="status-badge processed">Processed</span></td>
+                                <td><span class="reference-count">🔍 56 refs</span></td>
+                                <td>4.1 MB</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                        <button class="table-action-btn delete">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        <button class="page-btn">« Previous</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">5</button>
+                        <button class="page-btn">Next »</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: Live Data -->
+            <!-- SECTION 2B: Live Data Table -->
+            <!-- API: GET /historical-data (with filters for live data) -->
+            <div class="tab-content" id="live">
+                <div class="data-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <span>🔴</span>
+                            <span>Live Data (Post Go-Live)</span>
+                        </div>
+                        <div class="section-actions">
+                            <button class="action-btn filter">
+                                <span>🔍</span>
+                                <span>Filter</span>
+                            </button>
+                            <button class="action-btn export">
+                                <span>📥</span>
+                                <span>Export</span>
+                            </button>
+                            <button class="action-btn refresh">
+                                <span>🔄</span>
+                                <span>Refresh</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-filter-bar">
+                        <input type="text" class="search-input" placeholder="🔍 Search live data...">
+                        <select class="filter-select">
+                            <option>All Types</option>
+                            <option>New RFPs</option>
+                            <option>Generated Responses</option>
+                            <option>Generated Corrigenda</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Last 7 Days</option>
+                            <option>Last 30 Days</option>
+                            <option>Last 3 Months</option>
+                        </select>
+                    </div>
+
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>RFP Number</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Generated Date</th>
+                                <th>Status</th>
+                                <th>AI Used</th>
+                                <th>Accuracy</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>RFP-2024-NH-312</strong></td>
+                                <td>NH-44 Srinagar Tunnel Project</td>
+                                <td>New RFP</td>
+                                <td>Jan 13, 2026</td>
+                                <td><span class="status-badge processed">Active</span></td>
+                                <td>✅ Yes</td>
+                                <td>92%</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2024-NH-312</strong></td>
+                                <td>Query Response #24: Technical Specifications</td>
+                                <td>AI Response</td>
+                                <td>Jan 12, 2026</td>
+                                <td><span class="status-badge processed">Published</span></td>
+                                <td>✅ Yes</td>
+                                <td>89%</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2024-NH-298</strong></td>
+                                <td>Corrigendum-1: EMD Exemption Clarification</td>
+                                <td>AI Corrigendum</td>
+                                <td>Jan 11, 2026</td>
+                                <td><span class="status-badge processed">Published</span></td>
+                                <td>✅ Yes</td>
+                                <td>95%</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>RFP-2024-NH-285</strong></td>
+                                <td>Delhi-Dehradun Expressway - HAM Mode</td>
+                                <td>New RFP</td>
+                                <td>Jan 10, 2026</td>
+                                <td><span class="status-badge processed">Active</span></td>
+                                <td>✅ Yes</td>
+                                <td>88%</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="table-action-btn view">View</button>
+                                        <button class="table-action-btn edit">Edit</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="pagination">
+                        <button class="page-btn">« Previous</button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">Next »</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: Most Referenced -->
+            <!-- SECTION 2C: Most Referenced Table -->
+            <!-- API: GET /historical-data (with filter for most referenced/top 25) -->
+            <div class="tab-content" id="referenced">
+                <div class="referenced-section">
+                    <div style="background:#f3e5f5;border-left:4px solid #8e24aa;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#8e24aa;font-weight:500;">
+                        Section 2C: Most Referenced Table<br>
+                        <span style="font-size:12px;color:#333;">API: <b>GET /historical-data</b> (with filter for most referenced/top 25)</span>
+                    </div>
+                    <div class="section-title" style="margin-bottom: 20px;">
+                        <span>⭐</span>
+                        <span>Most Referenced Historical Data (Top 25)</span>
+                    </div>
+
+                    <div class="referenced-list">
+                        <div class="referenced-item">
+                            <div class="referenced-header">
+                                <div class="referenced-rfp">RFP-2023-NH-145 - Mumbai-Pune Expressway</div>
+                                <div class="referenced-stats">
+                                    <div class="referenced-stat">
+                                        <span>🔍</span>
+                                        <span><strong>89</strong> references</span>
+                                    </div>
+                                    <div class="referenced-stat">
+                                        <span>📊</span>
+                                        <span><strong>95%</strong> accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="referenced-stats">
+                                <span>📁 RFP + Pre-Bid Q&A</span>
+                                <span>•</span>
+                                <span>Last used: 2 hours ago</span>
+                                <span>•</span>
+                                <span>Uploaded: Dec 14, 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="referenced-item">
+                            <div class="referenced-header">
+                                <div class="referenced-rfp">RFP-2022-NH-201 - Delhi-Amritsar Highway Project</div>
+                                <div class="referenced-stats">
+                                    <div class="referenced-stat">
+                                        <span>🔍</span>
+                                        <span><strong>76</strong> references</span>
+                                    </div>
+                                    <div class="referenced-stat">
+                                        <span>📊</span>
+                                        <span><strong>92%</strong> accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="referenced-stats">
+                                <span>📁 RFP + Corrigendum</span>
+                                <span>•</span>
+                                <span>Last used: 5 hours ago</span>
+                                <span>•</span>
+                                <span>Uploaded: Nov 28, 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="referenced-item">
+                            <div class="referenced-header">
+                                <div class="referenced-rfp">RFP-2023-NH-089 - Bangalore Ring Road - HAM</div>
+                                <div class="referenced-stats">
+                                    <div class="referenced-stat">
+                                        <span>🔍</span>
+                                        <span><strong>68</strong> references</span>
+                                    </div>
+                                    <div class="referenced-stat">
+                                        <span>📊</span>
+                                        <span><strong>88%</strong> accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="referenced-stats">
+                                <span>📁 Complete Package</span>
+                                <span>•</span>
+                                <span>Last used: 1 day ago</span>
+                                <span>•</span>
+                                <span>Uploaded: Dec 10, 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="referenced-item">
+                            <div class="referenced-header">
+                                <div class="referenced-rfp">RFP-2021-NH-156 - Chennai Port Connectivity</div>
+                                <div class="referenced-stats">
+                                    <div class="referenced-stat">
+                                        <span>🔍</span>
+                                        <span><strong>56</strong> references</span>
+                                    </div>
+                                    <div class="referenced-stat">
+                                        <span>📊</span>
+                                        <span><strong>90%</strong> accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="referenced-stats">
+                                <span>📁 RFP + Pre-Bid Q&A</span>
+                                <span>•</span>
+                                <span>Last used: 2 days ago</span>
+                                <span>•</span>
+                                <span>Uploaded: Nov 15, 2024</span>
+                            </div>
+                        </div>
+
+                        <div class="referenced-item">
+                            <div class="referenced-header">
+                                <div class="referenced-rfp">RFP-2022-NH-089 - Kolkata East-West Metro Corridor</div>
+                                <div class="referenced-stats">
+                                    <div class="referenced-stat">
+                                        <span>🔍</span>
+                                        <span><strong>47</strong> references</span>
+                                    </div>
+                                    <div class="referenced-stat">
+                                        <span>📊</span>
+                                        <span><strong>87%</strong> accuracy</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="referenced-stats">
+                                <span>📁 RFP + Multiple Corrigenda</span>
+                                <span>•</span>
+                                <span>Last used: 3 days ago</span>
+                                <span>•</span>
+                                <span>Uploaded: Dec 5, 2024</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="action-btn filter">
+                            <span>📄</span>
+                            <span>View All 25 Most Referenced</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 4: Upload History -->
+            <!-- SECTION 2D: Upload History Table -->
+            <!-- API: GET /historical-data (with filter for upload history or dedicated endpoint if present) -->
+            <div class="tab-content" id="history">
+                <div class="upload-history">
+                    <div style="background:#e0f7fa;border-left:4px solid #00838f;padding:6px 12px;margin-bottom:8px;font-size:13px;color:#00838f;font-weight:500;">
+                        Section 2D: Upload History Table<br>
+                        <span style="font-size:12px;color:#333;">API: <b>GET /historical-data</b> (with filter for upload history or dedicated endpoint if present)</span>
+                    </div>
+                    <div class="section-title" style="margin-bottom: 25px;">
+                        <span>📝</span>
+                        <span>Upload History (Last 30 Days)</span>
+                    </div>
+
+                    <div class="history-timeline">
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-title">Bulk Upload: Historical Pre-Bid Q&A Dataset</div>
+                                <div class="history-time">2 hours ago</div>
+                            </div>
+                            <div class="history-details">
+                                Uploaded 45 Q&A documents from 2022-2023 highway projects. All files processed successfully.
+                            </div>
+                            <div class="history-meta">
+                                <span>👤 Admin User</span>
+                                <span>•</span>
+                                <span>📦 45 files</span>
+                                <span>•</span>
+                                <span>💾 127 MB</span>
+                                <span>•</span>
+                                <span>✅ 100% Success</span>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-title">RFP Document: NH-44 Srinagar Tunnel Project</div>
+                                <div class="history-time">5 hours ago</div>
+                            </div>
+                            <div class="history-details">
+                                Uploaded complete RFP package including SBD, technical specifications, and annexures.
+                            </div>
+                            <div class="history-meta">
+                                <span>👤 Admin User</span>
+                                <span>•</span>
+                                <span>📦 1 file</span>
+                                <span>•</span>
+                                <span>💾 18.5 MB</span>
+                                <span>•</span>
+                                <span>✅ Processed</span>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-title">Corrigendum: Mumbai-Pune Expressway Amendment</div>
+                                <div class="history-time">Yesterday at 4:30 PM</div>
+                            </div>
+                            <div class="history-details">
+                                Uploaded corrigendum document with technical specification amendments.
+                            </div>
+                            <div class="history-meta">
+                                <span>👤 System Auto-Upload</span>
+                                <span>•</span>
+                                <span>📦 1 file</span>
+                                <span>•</span>
+                                <span>💾 2.3 MB</span>
+                                <span>•</span>
+                                <span>✅ Processed</span>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-title">Bulk Upload: 2021 Historical RFPs</div>
+                                <div class="history-time">Jan 10, 2026</div>
+                            </div>
+                            <div class="history-details">
+                                Uploaded 23 historical RFP documents from 2021 for knowledge base enrichment.
+                            </div>
+                            <div class="history-meta">
+                                <span>👤 Admin User</span>
+                                <span>•</span>
+                                <span>📦 23 files</span>
+                                <span>•</span>
+                                <span>💾 342 MB</span>
+                                <span>•</span>
+                                <span>✅ 95.7% Success</span>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-title">Pre-Bid Q&A: Delhi-Dehradun Expressway</div>
+                                <div class="history-time">Jan 9, 2026</div>
+                            </div>
+                            <div class="history-details">
+                                Uploaded pre-bid meeting minutes and Q&A responses (CSV format).
+                            </div>
+                            <div class="history-meta">
+                                <span>👤 Admin User</span>
+                                <span>•</span>
+                                <span>📦 1 file</span>
+                                <span>•</span>
+                                <span>💾 4.7 MB</span>
+                                <span>•</span>
+                                <span>✅ Processed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 25px;">
+                        <button class="action-btn filter">
+                            <span>📄</span>
+                            <span>Load More History</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 5: Query Document (Ask AI) and Retry Failed Processing (not directly visible, but mapped to row actions) -->
+    <!-- Query: POST /historical-data/:id/query | Retry: POST /historical-data/:id/retry -->
+    <div style="background:#fbe9e7;border-left:4px solid #d84315;padding:6px 12px;margin:24px 0 0 0;font-size:13px;color:#d84315;font-weight:500;">
+        Section 5: Query Document (Ask AI) & Retry Failed Processing<br>
+        <span style="font-size:12px;color:#333;">Query: <b>POST /historical-data/:id/query</b> | Retry: <b>POST /historical-data/:id/retry</b></span>
+    </div>
+    <!-- Footer Navigation -->
+    <div class="footer-nav">
+        <div class="footer-nav-left">
+            <span class="screen-info">Screen: Historical Data Management</span>
+            <span>|</span>
+            <span>Previous: <a href="screen_06_admin_dashboard.html" style="color: #2a5298; text-decoration: none;">Admin Dashboard</a></span>
+        </div>
+        <div>
+            <a href="screen_07_prebid_query_management.html" class="nav-button">Next: Pre-bid Query Management →</a>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+        }
+
+        function uploadType(type) {
+            alert('Opening upload dialog for: ' + type.toUpperCase());
+            // In real implementation, this would open a file upload modal
+        }
+    </script>
+</body>
+</html>

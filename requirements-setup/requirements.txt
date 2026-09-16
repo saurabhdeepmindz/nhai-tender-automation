@@ -1,0 +1,176 @@
+# ============================================================================
+# NHAI Tender Query Automation System
+# Python RAG Services - Requirements File
+# ============================================================================
+# 
+# This file contains all Python dependencies required for:
+# - Screen 7: History Retriever Agent
+# - Screen 8: Chief Engineer Agent
+# - Shared Utilities
+#
+# Installation: pip install -r requirements.txt --break-system-packages
+# Python Version: 3.10 or higher
+# Last Updated: January 2026
+# ============================================================================
+
+# ============================================================================
+# CORE WEB FRAMEWORK
+# ============================================================================
+fastapi==0.109.0                    # Modern web framework for APIs
+uvicorn[standard]==0.27.0           # ASGI server for FastAPI
+pydantic==2.5.3                     # Data validation using Python type hints
+pydantic-settings==2.1.0            # Settings management with Pydantic
+python-multipart==0.0.6             # Required for file uploads in FastAPI
+
+# ============================================================================
+# LANGCHAIN ECOSYSTEM
+# ============================================================================
+langchain==0.1.6                    # LangChain core library
+langchain-core==0.1.16              # Core abstractions for LangChain
+langchain-community==0.0.16         # Community integrations
+langchain-openai==0.0.5             # OpenAI integration for LangChain
+langgraph==0.0.20                   # LangGraph for agent workflows
+langsmith==0.0.83                   # LangSmith for tracing (optional)
+
+# ============================================================================
+# LLM PROVIDERS
+# ============================================================================
+openai==1.10.0                      # OpenAI API client
+ollama==0.1.6                       # Ollama local LLM client
+
+# ============================================================================
+# VECTOR DATABASES
+# ============================================================================
+chromadb==0.4.22                    # ChromaDB vector database
+sentence-transformers==2.3.1        # For local embeddings
+
+# ============================================================================
+# DOCUMENT PROCESSING
+# ============================================================================
+PyPDF2==3.0.1                       # PDF file processing
+python-docx==1.1.0                  # Microsoft Word (.docx) processing
+openpyxl==3.1.2                     # Excel file processing (.xlsx)
+pandas==2.2.0                       # Data manipulation and CSV processing
+python-pptx==0.6.23                 # PowerPoint file processing
+pypandoc==1.12                      # Universal document converter (requires pandoc)
+
+# ============================================================================
+# TEXT PROCESSING & NLP
+# ============================================================================
+tiktoken==0.5.2                     # Token counting for OpenAI models
+nltk==3.8.1                         # Natural Language Toolkit
+spacy==3.7.2                        # Industrial-strength NLP
+
+# ============================================================================
+# EMBEDDINGS
+# ============================================================================
+nomic==1.1.4                        # Nomic embeddings client
+transformers==4.37.2                # Hugging Face transformers (for local models)
+torch==2.1.2                        # PyTorch (required for transformers)
+
+# ============================================================================
+# UTILITIES
+# ============================================================================
+python-dotenv==1.0.0                # Load environment variables from .env
+requests==2.31.0                    # HTTP library
+httpx==0.26.0                       # Async HTTP client (used by FastAPI)
+aiofiles==23.2.1                    # Async file operations
+typing-extensions==4.9.0            # Backport of typing features
+
+# ============================================================================
+# LOGGING & MONITORING
+# ============================================================================
+loguru==0.7.2                       # Advanced logging library
+colorama==0.4.6                     # Colored terminal output
+python-json-logger==2.0.7           # JSON logging
+
+# ============================================================================
+# VALIDATION & PARSING
+# ============================================================================
+jsonschema==4.20.0                  # JSON schema validation
+pyyaml==6.0.1                       # YAML parsing
+toml==0.10.2                        # TOML parsing
+
+# ============================================================================
+# DATABASE & CACHING
+# ============================================================================
+redis==5.0.1                        # Redis client (for caching, optional)
+psycopg2-binary==2.9.9              # PostgreSQL adapter (if connecting to DB)
+
+# ============================================================================
+# ASYNC & CONCURRENCY
+# ============================================================================
+asyncio==3.4.3                      # Async I/O (built-in but explicit)
+aiohttp==3.9.1                      # Async HTTP client/server
+
+# ============================================================================
+# TESTING & DEVELOPMENT
+# ============================================================================
+pytest==7.4.4                       # Testing framework
+pytest-asyncio==0.23.3              # Async support for pytest
+pytest-cov==4.1.0                   # Coverage plugin for pytest
+black==24.1.1                       # Code formatter
+flake8==7.0.0                       # Linting
+mypy==1.8.0                         # Static type checker
+
+# ============================================================================
+# SECURITY & AUTHENTICATION
+# ============================================================================
+python-jose[cryptography]==3.3.0    # JWT tokens
+passlib[bcrypt]==1.7.4              # Password hashing
+cryptography==42.0.0                # Cryptographic recipes
+
+# ============================================================================
+# DATA SCIENCE & MATH
+# ============================================================================
+numpy==1.26.3                       # Numerical computing
+scipy==1.12.0                       # Scientific computing
+
+# ============================================================================
+# ENVIRONMENT-SPECIFIC (OPTIONAL)
+# ============================================================================
+# Uncomment for GPU support:
+# torch==2.1.2+cu121               # PyTorch with CUDA 12.1
+# -f https://download.pytorch.org/whl/torch_stable.html
+
+# ============================================================================
+# COMPATIBILITY NOTES
+# ============================================================================
+# Python Version: 3.10+
+# Windows: Use --break-system-packages flag with pip
+# Linux: May need to install system dependencies (see documentation)
+# macOS: Works out of the box with Homebrew Python
+#
+# For Ollama support, install Ollama separately:
+# - Windows: https://ollama.ai/download
+# - Linux: curl -fsSL https://ollama.ai/install.sh | sh
+# - macOS: brew install ollama
+#
+# For GPU acceleration with transformers:
+# - Install CUDA Toolkit 12.1+
+# - Install cuDNN 8.9+
+# - Use PyTorch with CUDA support (uncomment above)
+# ============================================================================
+
+# ============================================================================
+# INSTALLATION COMMANDS
+# ============================================================================
+# Standard installation:
+#   pip install -r requirements.txt
+#
+# Windows (recommended):
+#   pip install -r requirements.txt --break-system-packages
+#
+# With virtual environment:
+#   python -m venv venv
+#   source venv/bin/activate  # Linux/Mac
+#   .\venv\Scripts\activate   # Windows
+#   pip install -r requirements.txt
+#
+# Upgrade existing packages:
+#   pip install -r requirements.txt --upgrade
+#
+# Install specific versions only:
+#   pip install -r requirements.txt --no-deps
+#   (Not recommended - may break dependencies)
+# ============================================================================
